@@ -1,0 +1,2671 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Entrenamientos Mestre</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { font-family: 'Space Grotesk', system-ui, sans-serif !important; }
+    html, body { background: #020817 !important; min-height: 100vh; }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: linear-gradient(to bottom, #a3e635, #22d3ee); border-radius: 99px; }
+
+    /* Keyframes */
+    @keyframes blob {
+      0%,100% { transform: translate(0,0) scale(1); }
+      33%      { transform: translate(50px,-70px) scale(1.12); }
+      66%      { transform: translate(-35px,35px) scale(0.88); }
+    }
+    @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+    @keyframes slide-up { from{opacity:0;transform:translateY(28px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes scale-in { from{opacity:0;transform:scale(0.92)} to{opacity:1;transform:scale(1)} }
+    @keyframes fade-in { from{opacity:0} to{opacity:1} }
+    @keyframes glow-pulse { 0%,100%{opacity:0.6} 50%{opacity:1} }
+    @keyframes gradient-x {
+      0%,100% { background-position:0% 50%; }
+      50%      { background-position:100% 50%; }
+    }
+    @keyframes count-pop { 0%{transform:scale(1)} 50%{transform:scale(1.1)} 100%{transform:scale(1)} }
+
+    /* Utility classes */
+    .animate-blob        { animation: blob 14s ease-in-out infinite; }
+    .animate-float       { animation: float 5s ease-in-out infinite; }
+    .animate-slide-up    { animation: slide-up 0.45s cubic-bezier(0.16,1,0.3,1) both; }
+    .animate-scale-in    { animation: scale-in 0.35s cubic-bezier(0.16,1,0.3,1) both; }
+    .animate-fade-in     { animation: fade-in 0.4s ease both; }
+    .animate-glow-pulse  { animation: glow-pulse 2.5s ease-in-out infinite; }
+    .animate-gradient-x  { background-size:300% 300%; animation:gradient-x 8s ease infinite; }
+
+    /* Gradient text */
+    .gradient-text {
+      background: linear-gradient(135deg, #a3e635, #22d3ee);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+      background-clip:text; display:inline-block;
+    }
+    .gradient-text-warm {
+      background: linear-gradient(135deg, #f59e0b, #ef4444);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+      background-clip:text; display:inline-block;
+    }
+    .gradient-text-violet {
+      background: linear-gradient(135deg, #a78bfa, #ec4899);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+      background-clip:text; display:inline-block;
+    }
+
+    /* Glass surfaces */
+    .glass {
+      background: rgba(2,8,23,0.75) !important;
+      backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+    }
+    .glass-card {
+      background: rgba(15,23,42,0.55) !important;
+      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    }
+
+    /* Card lift on hover */
+    .card-lift { transition: transform 0.28s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.28s ease; }
+    .card-lift:hover { transform: translateY(-7px) scale(1.01); box-shadow: 0 30px 60px rgba(0,0,0,0.55); }
+
+    /* Primary button glow */
+    .btn-glow {
+      background: linear-gradient(135deg, #a3e635, #65a30d) !important;
+      box-shadow: 0 4px 22px rgba(163,230,53,0.45) !important;
+      color: #020817 !important; font-weight: 700 !important;
+      transition: all 0.2s ease !important;
+    }
+    .btn-glow:hover { box-shadow: 0 8px 38px rgba(163,230,53,0.7) !important; transform: translateY(-1px) !important; }
+    .btn-glow:active { transform: translateY(0) !important; }
+
+    /* Nav active pill */
+    .nav-active {
+      background: linear-gradient(135deg, #a3e635, #65a30d) !important;
+      box-shadow: 0 4px 20px rgba(163,230,53,0.5) !important;
+      color: #020817 !important;
+    }
+
+    /* Glow borders by color */
+    .glow-lime   { border: 1px solid rgba(163,230,53,0.22) !important; box-shadow: 0 0 40px rgba(163,230,53,0.07) inset, 0 2px 30px rgba(163,230,53,0.05) !important; }
+    .glow-cyan   { border: 1px solid rgba(34,211,238,0.22) !important; box-shadow: 0 0 40px rgba(34,211,238,0.07) inset !important; }
+    .glow-amber  { border: 1px solid rgba(245,158,11,0.22) !important; box-shadow: 0 0 40px rgba(245,158,11,0.07) inset !important; }
+    .glow-violet { border: 1px solid rgba(167,139,250,0.22) !important; box-shadow: 0 0 40px rgba(167,139,250,0.07) inset !important; }
+    .glow-emerald{ border: 1px solid rgba(52,211,153,0.22) !important; box-shadow: 0 0 40px rgba(52,211,153,0.07) inset !important; }
+
+    /* Hero animated background */
+    .hero-bg {
+      background: linear-gradient(-45deg, #091f11, #0b1929, #13102a, #091f11);
+      background-size: 400% 400%;
+      animation: gradient-x 10s ease infinite;
+    }
+
+    /* Modal animation */
+    .modal-sheet { animation: slide-up 0.42s cubic-bezier(0.16,1,0.3,1) both; }
+
+    /* ── Nuevas animaciones fun ── */
+    @keyframes confetti-fall {
+      0%   { transform: translateY(-30px) rotate(0deg) scale(1); opacity: 1; }
+      70%  { opacity: 1; }
+      100% { transform: translateY(105vh) rotate(680deg) scale(0.5); opacity: 0; }
+    }
+    @keyframes bounce-in {
+      0%   { transform: scale(0.2) translateY(16px); opacity: 0; }
+      55%  { transform: scale(1.08) translateY(-4px); opacity: 1; }
+      80%  { transform: scale(0.97); }
+      100% { transform: scale(1) translateY(0); opacity: 1; }
+    }
+    @keyframes wiggle-icon {
+      0%,100% { transform: rotate(0); }
+      20%  { transform: rotate(-14deg) scale(1.1); }
+      40%  { transform: rotate(14deg) scale(1.1); }
+      60%  { transform: rotate(-9deg); }
+      80%  { transform: rotate(9deg); }
+    }
+    @keyframes toast-in {
+      from { transform: translateX(110%) scale(0.85); opacity: 0; }
+      to   { transform: translateX(0) scale(1); opacity: 1; }
+    }
+    @keyframes toast-out {
+      from { transform: translateX(0); opacity: 1; }
+      to   { transform: translateX(110%); opacity: 0; }
+    }
+    @keyframes shine-sweep {
+      0%   { transform: translateX(-120%) skewX(-20deg); }
+      100% { transform: translateX(250%) skewX(-20deg); }
+    }
+    @keyframes pop-num {
+      0%,100% { transform: scale(1); }
+      40%     { transform: scale(1.18); }
+    }
+    @keyframes sparkle {
+      0%   { transform: scale(0) rotate(0); opacity: 1; }
+      50%  { transform: scale(1.5) rotate(180deg); opacity: 0.8; }
+      100% { transform: scale(0) rotate(360deg); opacity: 0; }
+    }
+    @keyframes emoji-pop {
+      0%   { transform: scale(0) translateY(0); opacity: 0; }
+      30%  { transform: scale(1.4) translateY(-10px); opacity: 1; }
+      60%  { transform: scale(1) translateY(-20px); opacity: 1; }
+      100% { transform: scale(0.7) translateY(-40px); opacity: 0; }
+    }
+    @keyframes nav-ping {
+      0%   { transform: scale(1); opacity: 0.7; }
+      100% { transform: scale(2); opacity: 0; }
+    }
+
+    .animate-bounce-in { animation: bounce-in 0.55s cubic-bezier(0.34,1.56,0.64,1) both; }
+    .animate-wiggle     { animation: wiggle-icon 0.5s ease both; }
+    .animate-toast-in   { animation: toast-in 0.42s cubic-bezier(0.16,1,0.3,1) both; }
+    .animate-toast-out  { animation: toast-out 0.35s ease forwards; }
+    .animate-pop-num    { animation: pop-num 0.4s ease both; }
+
+    /* Shine sweep on primary buttons */
+    .btn-glow { position: relative !important; overflow: hidden !important; }
+    .btn-glow::after {
+      content: '';
+      position: absolute; top: 0; left: 0; width: 50%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.28), transparent);
+      transform: translateX(-120%) skewX(-20deg);
+      pointer-events: none;
+    }
+    .btn-glow:hover::after { animation: shine-sweep 0.65s ease forwards; }
+
+    /* Stagger delays for grid items */
+    .stagger-1 { animation-delay: 0.04s !important; }
+    .stagger-2 { animation-delay: 0.08s !important; }
+    .stagger-3 { animation-delay: 0.12s !important; }
+    .stagger-4 { animation-delay: 0.16s !important; }
+    .stagger-5 { animation-delay: 0.20s !important; }
+    .stagger-6 { animation-delay: 0.24s !important; }
+    .stagger-7 { animation-delay: 0.28s !important; }
+    .stagger-8 { animation-delay: 0.32s !important; }
+
+    /* Nav ping ring on active */
+    .nav-ping::before {
+      content: '';
+      position: absolute; inset: 0;
+      border-radius: inherit;
+      background: rgba(163,230,53,0.4);
+      animation: nav-ping 1.8s cubic-bezier(0,0,0.2,1) infinite;
+    }
+    .nav-active { position: relative; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script>
+    window.storage = {
+      get: async (key) => {
+        const value = localStorage.getItem(key);
+        return value !== null ? { value } : null;
+      },
+      set: async (key, value) => {
+        localStorage.setItem(key, value);
+      }
+    };
+  </script>
+
+  <script type="text/babel" data-presets="react">
+    const { useState, useEffect } = React;
+
+    /* ── Iconos SVG ─────────────────────────────────────────────────────── */
+    function SvgIcon({ d, className }) {
+      return (
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+          viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+          className={className}>
+          {d}
+        </svg>
+      );
+    }
+
+    const Users = (p) => <SvgIcon {...p} d={<>
+      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+      <circle cx="9" cy="7" r="4"/>
+      <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+      <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+    </>} />;
+
+    const Dumbbell = (p) => <SvgIcon {...p} d={<>
+      <path d="m6.5 6.5 11 11"/><path d="m21 21-1-1"/><path d="m3 3 1 1"/>
+      <path d="m18 22 4-4"/><path d="m2 6 4-4"/><path d="m3 10 7-7"/><path d="m14 21 7-7"/>
+    </>} />;
+
+    const BarChart3 = (p) => <SvgIcon {...p} d={<>
+      <path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/>
+    </>} />;
+
+    const Plus = (p) => <SvgIcon {...p} d={<>
+      <path d="M5 12h14"/><path d="M12 5v14"/>
+    </>} />;
+
+    const Trash2 = (p) => <SvgIcon {...p} d={<>
+      <path d="M3 6h18"/>
+      <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+      <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+      <line x1="10" x2="10" y1="11" y2="17"/>
+      <line x1="14" x2="14" y1="11" y2="17"/>
+    </>} />;
+
+    const Edit2 = (p) => <SvgIcon {...p} d={<>
+      <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>
+    </>} />;
+
+    const X = (p) => <SvgIcon {...p} d={<>
+      <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
+    </>} />;
+
+    const ChevronRight = (p) => <SvgIcon {...p} d={<>
+      <path d="m9 18 6-6-6-6"/>
+    </>} />;
+
+    const Calendar = (p) => <SvgIcon {...p} d={<>
+      <path d="M8 2v4"/><path d="M16 2v4"/>
+      <rect width="18" height="18" x="3" y="4" rx="2"/>
+      <path d="M3 10h18"/>
+    </>} />;
+
+    const TrendingUp = (p) => <SvgIcon {...p} d={<>
+      <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/>
+      <polyline points="16 7 22 7 22 13"/>
+    </>} />;
+
+    const Activity = (p) => <SvgIcon {...p} d={<>
+      <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+    </>} />;
+
+    const Target = (p) => <SvgIcon {...p} d={<>
+      <circle cx="12" cy="12" r="10"/>
+      <circle cx="12" cy="12" r="6"/>
+      <circle cx="12" cy="12" r="2"/>
+    </>} />;
+
+    const Flame = (p) => <SvgIcon {...p} d={<>
+      <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>
+    </>} />;
+
+    const Award = (p) => <SvgIcon {...p} d={<>
+      <circle cx="12" cy="8" r="6"/>
+      <path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/>
+    </>} />;
+
+    const Save = (p) => <SvgIcon {...p} d={<>
+      <path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/>
+      <path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7"/>
+      <path d="M7 3v4a1 1 0 0 0 1 1h7"/>
+    </>} />;
+
+    const ArrowLeft = (p) => <SvgIcon {...p} d={<>
+      <path d="m12 19-7-7 7-7"/><path d="M19 12H5"/>
+    </>} />;
+
+    const Phone = (p) => <SvgIcon {...p} d={<>
+      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.49 11 19.79 19.79 0 0 1 1.21 2.45A2 2 0 0 1 3.22.18h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.09 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 21 16z"/>
+    </>} />;
+
+    const Mail = (p) => <SvgIcon {...p} d={<>
+      <rect width="20" height="16" x="2" y="4" rx="2"/>
+      <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+    </>} />;
+
+    const Zap = (p) => <SvgIcon {...p} d={<>
+      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+    </>} />;
+
+    const User = (p) => <SvgIcon {...p} d={<>
+      <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
+      <circle cx="12" cy="7" r="4"/>
+    </>} />;
+
+    const Receipt = (p) => <SvgIcon {...p} d={<>
+      <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1Z"/>
+      <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/>
+      <path d="M12 17.5v-11"/>
+    </>} />;
+
+    const CheckCircle = (p) => <SvgIcon {...p} d={<>
+      <circle cx="12" cy="12" r="10"/>
+      <path d="m9 12 2 2 4-4"/>
+    </>} />;
+
+    const Clock = (p) => <SvgIcon {...p} d={<>
+      <circle cx="12" cy="12" r="10"/>
+      <polyline points="12 6 12 12 16 14"/>
+    </>} />;
+
+    /* ── Gráficas CSS (sin librería externa) ────────────────────────────── */
+    function BarChartCSS({ data, labelKey, valueKey }) {
+      const max = Math.max(...data.map(d => d[valueKey]), 1);
+      return (
+        <div className="flex items-end gap-2 h-40 pt-6">
+          {data.map((d, i) => (
+            <div key={i} className="flex-1 flex flex-col items-center gap-1">
+              <span className="text-[10px] text-lime-400 font-bold">{d[valueKey]}</span>
+              <div
+                className="w-full bg-lime-400 rounded-t transition-all"
+                style={{ height: `${Math.max((d[valueKey] / max) * 100, 4)}%` }}
+              />
+              <span className="text-[10px] text-slate-500 whitespace-nowrap">{d[labelKey]}</span>
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    function PieChartCSS({ data, colors }) {
+      const total = data.reduce((s, d) => s + d.value, 0) || 1;
+      return (
+        <div className="space-y-3 py-2">
+          {data.map((d, i) => (
+            <div key={i} className="flex items-center gap-3">
+              <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: colors[i % colors.length] }} />
+              <div className="flex-1">
+                <div className="flex justify-between text-sm mb-1">
+                  <span className="font-semibold">{d.name}</span>
+                  <span className="text-slate-400">{d.value} ({Math.round(d.value / total * 100)}%)</span>
+                </div>
+                <div className="w-full bg-slate-800 rounded-full h-2">
+                  <div className="h-2 rounded-full transition-all" style={{ width: `${d.value / total * 100}%`, backgroundColor: colors[i % colors.length] }} />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    function HBarChartCSS({ data, nameKey, valueKey }) {
+      const max = Math.max(...data.map(d => d[valueKey]), 1);
+      return (
+        <div className="space-y-3 py-2">
+          {data.map((d, i) => (
+            <div key={i} className="flex items-center gap-3">
+              <div className="w-28 text-sm text-slate-300 truncate">{d[nameKey]}</div>
+              <div className="flex-1 bg-slate-800 rounded-full h-5 overflow-hidden">
+                <div
+                  className="h-5 bg-lime-400 rounded-full transition-all"
+                  style={{ width: `${(d[valueKey] / max) * 100}%` }}
+                />
+              </div>
+              <div className="w-6 text-sm font-black text-lime-400">{d[valueKey]}</div>
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    /* ── Sistema global de eventos ─────────────────────────────────────── */
+    const _bus = { toast: [], confetti: [] };
+    const showToast = (msg, type = 'success') => _bus.toast.forEach(fn => fn({ msg, type, id: Date.now() + Math.random() }));
+    const fireConfetti = () => _bus.confetti.forEach(fn => fn());
+
+    /* ── CountUp: número que anima desde 0 ─────────────────────────────── */
+    function CountUp({ to }) {
+      const { useEffect: ue, useState: us, useRef: ur } = React;
+      const n = Number(to) || 0;
+      const [val, setVal] = us(0);
+      const prev = ur(n);
+      ue(() => {
+        const start = Date.now();
+        const from = prev.current;
+        prev.current = n;
+        const dur = 700;
+        const tick = () => {
+          const t = Math.min((Date.now() - start) / dur, 1);
+          const eased = 1 - Math.pow(1 - t, 3);
+          setVal(Math.round(from + (n - from) * eased));
+          if (t < 1) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      }, [n]);
+      return <>{val}</>;
+    }
+
+    /* ── Confetti burst ─────────────────────────────────────────────────── */
+    function Confetti() {
+      const [particles, setParticles] = useState([]);
+      useEffect(() => {
+        const fire = () => {
+          const colors = ['#a3e635','#22d3ee','#f59e0b','#a78bfa','#ec4899','#34d399','#fff'];
+          const shapes = ['50%','4px','0'];
+          setParticles(Array.from({ length: 70 }, (_, i) => ({
+            id: i + Date.now(),
+            color: colors[i % colors.length],
+            x: 15 + Math.random() * 70,
+            delay: Math.random() * 0.7,
+            dur: 1.4 + Math.random() * 1.2,
+            size: 5 + Math.random() * 8,
+            radius: shapes[Math.floor(Math.random() * shapes.length)],
+          })));
+          setTimeout(() => setParticles([]), 3200);
+        };
+        _bus.confetti.push(fire);
+        return () => { const i = _bus.confetti.indexOf(fire); if (i >= 0) _bus.confetti.splice(i, 1); };
+      }, []);
+      if (!particles.length) return null;
+      return (
+        <div className="fixed inset-0 pointer-events-none z-[300] overflow-hidden">
+          {particles.map(p => (
+            <div key={p.id} className="absolute"
+              style={{
+                left: `${p.x}%`, top: '-20px',
+                width: p.size, height: p.size,
+                borderRadius: p.radius,
+                background: p.color,
+                animation: `confetti-fall ${p.dur}s ${p.delay}s ease-out forwards`,
+              }} />
+          ))}
+        </div>
+      );
+    }
+
+    /* ── Toast notifications ─────────────────────────────────────────────── */
+    function ToastContainer() {
+      const [toasts, setToasts] = useState([]);
+      useEffect(() => {
+        const fn = (t) => {
+          setToasts(p => [...p, t]);
+          setTimeout(() => setToasts(p => p.filter(x => x.id !== t.id)), 3200);
+        };
+        _bus.toast.push(fn);
+        return () => { const i = _bus.toast.indexOf(fn); if (i >= 0) _bus.toast.splice(i, 1); };
+      }, []);
+      const ICONS = { success: '💪', error: '✕', info: 'ℹ️' };
+      const COLORS = {
+        success: 'linear-gradient(135deg,#a3e635,#65a30d)',
+        error:   'linear-gradient(135deg,#ef4444,#dc2626)',
+        info:    'linear-gradient(135deg,#22d3ee,#0891b2)',
+      };
+      return (
+        <div className="fixed top-5 right-5 z-[250] flex flex-col gap-2.5 pointer-events-none" style={{ maxWidth: 260 }}>
+          {toasts.map(t => (
+            <div key={t.id} className="animate-toast-in flex items-center gap-3 px-4 py-3 rounded-2xl shadow-2xl pointer-events-auto"
+              style={{ background: COLORS[t.type] || COLORS.success, color: '#020817', fontWeight: 700, fontSize: 13 }}>
+              <span className="text-lg leading-none">{ICONS[t.type] || ICONS.success}</span>
+              <span>{t.msg}</span>
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    /* ── EmojiPop: reacción flotante ─────────────────────────────────────── */
+    function EmojiPop({ emoji, trigger }) {
+      const [visible, setVisible] = useState(false);
+      useEffect(() => {
+        if (!trigger) return;
+        setVisible(true);
+        const t = setTimeout(() => setVisible(false), 1000);
+        return () => clearTimeout(t);
+      }, [trigger]);
+      if (!visible) return null;
+      return (
+        <div className="fixed inset-0 pointer-events-none z-[200] flex items-center justify-center">
+          <span style={{ fontSize: 64, animation: 'emoji-pop 1s ease forwards' }}>{emoji}</span>
+        </div>
+      );
+    }
+
+    /* ── App principal ──────────────────────────────────────────────────── */
+    function EntrenamientosMestre() {
+      const [section, setSection] = useState('inicio');
+      const [clients, setClients] = useState([]);
+      const [workouts, setWorkouts] = useState([]);
+      const [selectedClient, setSelectedClient] = useState(null);
+      const [editingWorkout, setEditingWorkout] = useState(null);
+      const [showClientForm, setShowClientForm] = useState(false);
+      const [showWorkoutForm, setShowWorkoutForm] = useState(false);
+      const [sessions, setSessions] = useState([]);
+      const [loading, setLoading] = useState(true);
+      const [emojiTrigger, setEmojiTrigger] = useState(0);
+      const [emojiChar, setEmojiChar] = useState('💪');
+
+      const celebrate = (emoji = '💪') => {
+        setEmojiChar(emoji);
+        setEmojiTrigger(t => t + 1);
+        fireConfetti();
+      };
+
+      useEffect(() => {
+        const load = async () => {
+          try { const c = await window.storage.get('clients'); if (c) setClients(JSON.parse(c.value)); } catch (e) {}
+          try { const w = await window.storage.get('workouts'); if (w) setWorkouts(JSON.parse(w.value)); } catch (e) {}
+          try { const s = await window.storage.get('sessions'); if (s) setSessions(JSON.parse(s.value)); } catch (e) {}
+          setLoading(false);
+        };
+        load();
+      }, []);
+
+      const saveClients = async (list) => {
+        setClients(list);
+        try { await window.storage.set('clients', JSON.stringify(list)); } catch (e) {}
+      };
+      const saveWorkouts = async (list) => {
+        setWorkouts(list);
+        try { await window.storage.set('workouts', JSON.stringify(list)); } catch (e) {}
+      };
+      const saveSessions = async (list) => {
+        setSessions(list);
+        try { await window.storage.set('sessions', JSON.stringify(list)); } catch (e) {}
+      };
+
+      const addClient = (client) => {
+        saveClients([...clients, { ...client, id: Date.now().toString(), createdAt: new Date().toISOString() }]);
+        setShowClientForm(false);
+        celebrate('🎉');
+        showToast('¡Cliente añadido con éxito!');
+      };
+      const deleteClient = (id) => {
+        if (!confirm('¿Eliminar este cliente y todos sus entrenamientos?')) return;
+        saveClients(clients.filter(c => c.id !== id));
+        saveWorkouts(workouts.filter(w => w.clientId !== id));
+        if (selectedClient?.id === id) setSelectedClient(null);
+        showToast('Cliente eliminado', 'error');
+      };
+      const addWorkout = (workout) => {
+        if (editingWorkout) {
+          saveWorkouts(workouts.map(w => w.id === editingWorkout.id ? { ...workout, id: editingWorkout.id } : w));
+          setEditingWorkout(null);
+          showToast('Entrenamiento actualizado ✓', 'info');
+        } else {
+          saveWorkouts([...workouts, { ...workout, id: Date.now().toString(), createdAt: new Date().toISOString() }]);
+          celebrate('💪');
+          showToast('¡Entrenamiento creado!');
+        }
+        setShowWorkoutForm(false);
+      };
+      const deleteWorkout = (id) => {
+        if (confirm('¿Eliminar este entrenamiento?')) {
+          saveWorkouts(workouts.filter(w => w.id !== id));
+          showToast('Entrenamiento eliminado', 'error');
+        }
+      };
+
+      if (loading) {
+        return (
+          <div className="min-h-screen flex items-center justify-center">
+            <div className="flex flex-col items-center gap-4">
+              <div className="w-16 h-16 rounded-2xl btn-glow flex items-center justify-center animate-float">
+                <Flame className="w-8 h-8" style={{ color: '#020817' }} />
+              </div>
+              <div className="gradient-text text-lg font-black tracking-wider">CARGANDO...</div>
+            </div>
+          </div>
+        );
+      }
+
+      return (
+        <div className="min-h-screen text-white relative">
+          {/* Blobs de fondo animados */}
+          <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+            <div className="absolute top-[-15%] left-[-10%] w-[700px] h-[700px] rounded-full animate-blob"
+              style={{ background: 'radial-gradient(circle, rgba(163,230,53,0.12), transparent 70%)', filter: 'blur(60px)' }} />
+            <div className="absolute top-[35%] right-[-8%] w-[550px] h-[550px] rounded-full animate-blob"
+              style={{ background: 'radial-gradient(circle, rgba(34,211,238,0.1), transparent 70%)', filter: 'blur(60px)', animationDelay: '4s' }} />
+            <div className="absolute bottom-[-10%] left-[25%] w-[500px] h-[500px] rounded-full animate-blob"
+              style={{ background: 'radial-gradient(circle, rgba(167,139,250,0.09), transparent 70%)', filter: 'blur(60px)', animationDelay: '8s' }} />
+          </div>
+
+          <header className="glass border-b sticky top-0 z-40" style={{ borderColor: 'rgba(163,230,53,0.12)' }}>
+            <div className="max-w-7xl mx-auto px-4 pt-4 pb-1 flex items-center gap-4">
+              {/* Logo */}
+              <div className="flex items-center gap-3 flex-shrink-0">
+                <div className="relative">
+                  <div className="w-10 h-10 rounded-xl btn-glow flex items-center justify-center">
+                    <Flame className="w-5 h-5" style={{ color: '#020817' }} />
+                  </div>
+                  <div className="absolute inset-0 rounded-xl animate-glow-pulse pointer-events-none"
+                    style={{ background: 'rgba(163,230,53,0.35)', filter: 'blur(10px)', zIndex: -1 }} />
+                </div>
+                <div>
+                  <h1 className="text-base font-black tracking-tight leading-none">
+                    <span className="gradient-text">MESTRE</span>
+                  </h1>
+                  <p className="text-[9px] text-slate-500 font-semibold tracking-[0.2em] uppercase mt-0.5">Training Platform</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Nav tabs */}
+            <nav className="max-w-7xl mx-auto px-3 pb-3 flex gap-1 overflow-x-auto">
+              {[
+                { id: 'inicio', icon: Activity, label: 'Inicio' },
+                { id: 'clientes', icon: Users, label: 'Clientes' },
+                { id: 'entrenamientos', icon: Dumbbell, label: 'Entrenos' },
+                { id: 'calendario', icon: Calendar, label: 'Calendario' },
+                { id: 'analiticas', icon: BarChart3, label: 'Analíticas' },
+                { id: 'facturas', icon: Receipt, label: 'Facturas' },
+              ].map(({ id, icon: Icon, label }) => {
+                const active = section === id;
+                return (
+                  <button key={id} onClick={() => { setSection(id); setSelectedClient(null); }}
+                    className={`flex items-center gap-1.5 px-3 py-2 rounded-xl font-semibold text-sm whitespace-nowrap transition-all ${active ? 'nav-active' : 'text-slate-500 hover:text-slate-200 hover:bg-white/5'}`}>
+                    <Icon className="w-4 h-4 flex-shrink-0" />
+                    <span className={active ? 'hidden sm:inline' : 'hidden sm:inline'}>{label}</span>
+                  </button>
+                );
+              })}
+            </nav>
+          </header>
+
+          <main className="max-w-7xl mx-auto p-4 md:p-6 relative z-10">
+            {section === 'inicio' && <Inicio clients={clients} workouts={workouts} sessions={sessions} onSaveSessions={saveSessions} setSection={setSection} />}
+            {section === 'clientes' && (
+              selectedClient
+                ? <ClientDetail client={selectedClient} workouts={workouts.filter(w => w.clientId === selectedClient.id)}
+                    onBack={() => setSelectedClient(null)}
+                    onAddWorkout={() => { setEditingWorkout(null); setShowWorkoutForm(true); }}
+                    onEditWorkout={(w) => { setEditingWorkout(w); setShowWorkoutForm(true); }}
+                    onDeleteWorkout={deleteWorkout} onDeleteClient={() => deleteClient(selectedClient.id)} />
+                : <Clientes clients={clients} workouts={workouts} onAdd={() => setShowClientForm(true)} onSelect={setSelectedClient} onDelete={deleteClient} />
+            )}
+            {section === 'entrenamientos' && (
+              <Entrenamientos workouts={workouts} clients={clients}
+                onAdd={() => { setEditingWorkout(null); setShowWorkoutForm(true); }}
+                onEdit={(w) => { setEditingWorkout(w); setShowWorkoutForm(true); }}
+                onDelete={deleteWorkout} />
+            )}
+            {section === 'calendario' && <Calendario sessions={sessions} clients={clients} workouts={workouts} onSaveSessions={saveSessions} />}
+            {section === 'analiticas' && <Analiticas clients={clients} workouts={workouts} />}
+            {section === 'facturas' && <Facturas clients={clients} sessions={sessions} workouts={workouts} />}
+          </main>
+
+          {showClientForm && <ClientForm onSave={addClient} onClose={() => setShowClientForm(false)} />}
+          {showWorkoutForm && (
+            <WorkoutForm clients={clients} preselectedClient={selectedClient} editing={editingWorkout}
+              onSave={addWorkout} onClose={() => { setShowWorkoutForm(false); setEditingWorkout(null); }} />
+          )}
+
+          {/* Animaciones globales */}
+          <Confetti />
+          <ToastContainer />
+          <EmojiPop emoji={emojiChar} trigger={emojiTrigger} />
+        </div>
+      );
+    }
+
+    /* ── Inicio ─────────────────────────────────────────────────────────── */
+    function Inicio({ clients, workouts, sessions, onSaveSessions, setSection }) {
+      const today = new Date();
+      const todayStr = today.toISOString().split('T')[0];
+
+      const [selectedDay, setSelectedDay] = useState(todayStr);
+      const [showForm, setShowForm] = useState(false);
+      const [editingSession, setEditingSession] = useState(null);
+
+      // Semana actual Lun–Dom
+      const weekStart = new Date(today);
+      weekStart.setDate(today.getDate() - ((today.getDay() + 6) % 7));
+      const weekDays = Array.from({ length: 7 }, (_, i) => {
+        const d = new Date(weekStart);
+        d.setDate(weekStart.getDate() + i);
+        return d;
+      });
+      const DAY_LABELS = ['L','M','X','J','V','S','D'];
+
+      const sessionsByDate = {};
+      sessions.forEach(s => {
+        if (!sessionsByDate[s.date]) sessionsByDate[s.date] = [];
+        sessionsByDate[s.date].push(s);
+      });
+
+      const thisWeekCount = sessions.filter(s => {
+        const d = new Date(s.date);
+        return d >= weekStart && d <= weekDays[6];
+      }).length;
+
+      const todayCount = (sessionsByDate[todayStr] || []).length;
+      const clientColors = ['#a3e635','#22d3ee','#34d399','#f59e0b','#a78bfa'];
+
+      // Sesiones del día seleccionado
+      const selSessions = (sessionsByDate[selectedDay] || [])
+        .slice().sort((a, b) => a.time.localeCompare(b.time));
+
+      const selDate = new Date(selectedDay + 'T00:00:00');
+      const isSelToday = selectedDay === todayStr;
+      const selLabel = isSelToday
+        ? 'Hoy'
+        : selDate.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
+
+      const saveSession = (session) => {
+        if (editingSession) {
+          onSaveSessions(sessions.map(s => s.id === editingSession.id ? { ...session, id: editingSession.id } : s));
+          setEditingSession(null);
+          showToast('Sesión actualizada ✓', 'info');
+        } else {
+          onSaveSessions([...sessions, { ...session, id: Date.now().toString() }]);
+          fireConfetti();
+          showToast('¡Sesión creada! 🗓️');
+        }
+        setShowForm(false);
+      };
+      const deleteSession = (id) => {
+        if (confirm('¿Eliminar esta sesión?')) onSaveSessions(sessions.filter(s => s.id !== id));
+      };
+
+      // Próximas sesiones fuera de la semana actual
+      const lastWeekDay = weekDays[6].toISOString().split('T')[0];
+      const upcomingSessions = sessions
+        .filter(s => s.date > lastWeekDay)
+        .sort((a, b) => a.date === b.date ? a.time.localeCompare(b.time) : a.date.localeCompare(b.date))
+        .slice(0, 4);
+
+      return (
+        <div className="space-y-6">
+          {/* Hero */}
+          <div className="relative rounded-3xl overflow-hidden hero-bg p-7 md:p-10">
+            {/* Glow blobs internos */}
+            <div className="absolute top-0 left-0 w-72 h-72 rounded-full pointer-events-none"
+              style={{ background: 'radial-gradient(circle, rgba(163,230,53,0.18), transparent 70%)', filter: 'blur(50px)' }} />
+            <div className="absolute bottom-0 right-0 w-56 h-56 rounded-full pointer-events-none"
+              style={{ background: 'radial-gradient(circle, rgba(34,211,238,0.15), transparent 70%)', filter: 'blur(50px)' }} />
+            {/* Badge superior */}
+            <div className="relative z-10 inline-flex items-center gap-2 mb-5"
+              style={{ background: 'rgba(255,255,255,0.06)', backdropFilter: 'blur(10px)', borderRadius: 999, padding: '5px 14px', border: '1px solid rgba(255,255,255,0.1)' }}>
+              <div className="w-2 h-2 rounded-full bg-lime-400 animate-pulse" />
+              <span className="text-xs text-slate-300 font-semibold tracking-[0.15em] uppercase">Panel del entrenador</span>
+            </div>
+            <div className="relative z-10">
+              <h2 className="text-4xl md:text-6xl font-black leading-none mb-3">
+                <span className="gradient-text">¡Vamos</span>
+                <span className="text-white"> al lío!</span>
+              </h2>
+              <p className="text-slate-400 text-sm font-medium max-w-sm">
+                Gestiona clientes, planifica entrenamientos y analiza progresos en tiempo real.
+              </p>
+            </div>
+            {/* Icono decorativo flotante */}
+            <div className="absolute right-6 top-6 md:right-10 md:top-10 opacity-10 pointer-events-none animate-float">
+              <Flame className="w-24 h-24 md:w-32 md:h-32 text-lime-400" />
+            </div>
+          </div>
+
+          {/* Stats */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <StatCard icon={Users} value={clients.length} label="Clientes activos" color="lime" />
+            <StatCard icon={Dumbbell} value={workouts.length} label="Entrenamientos" color="emerald" />
+            <StatCard icon={Calendar} value={thisWeekCount} label="Sesiones esta semana" color="cyan" />
+            <StatCard icon={Activity} value={todayCount} label="Sesiones hoy" color="violet" />
+          </div>
+
+          {/* Semana interactiva */}
+          <div className="rounded-2xl overflow-hidden" style={{ background: 'rgba(10,18,35,0.8)', border: '1px solid rgba(255,255,255,0.06)' }}>
+            {/* Tira de días */}
+            <div className="p-4 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-xs font-bold text-slate-500 tracking-[0.15em] uppercase">Esta semana</span>
+                <button onClick={() => setSection('calendario')}
+                  className="text-xs text-lime-400 hover:text-lime-300 font-semibold flex items-center gap-1 transition-colors">
+                  Ver mes <ChevronRight className="w-3 h-3" />
+                </button>
+              </div>
+              <div className="grid grid-cols-7 gap-1.5">
+                {weekDays.map((d, i) => {
+                  const ds = d.toISOString().split('T')[0];
+                  const isToday = ds === todayStr;
+                  const isSelected = ds === selectedDay;
+                  const daySessions = sessionsByDate[ds] || [];
+                  return (
+                    <button key={i} onClick={() => setSelectedDay(ds)}
+                      className="flex flex-col items-center py-2.5 px-1 rounded-2xl transition-all"
+                      style={
+                        isToday
+                          ? { background: 'linear-gradient(135deg,#a3e635,#65a30d)', boxShadow: '0 4px 18px rgba(163,230,53,0.4)' }
+                          : isSelected
+                          ? { background: 'rgba(163,230,53,0.12)', border: '1px solid rgba(163,230,53,0.35)' }
+                          : { background: 'transparent' }
+                      }>
+                      <span className="text-[9px] font-bold mb-1" style={{ color: isToday ? '#020817' : '#64748b' }}>{DAY_LABELS[i]}</span>
+                      <span className="text-base font-black leading-none" style={{ color: isToday ? '#020817' : isSelected ? '#a3e635' : '#fff' }}>{d.getDate()}</span>
+                      <div className="flex gap-0.5 mt-1.5 flex-wrap justify-center min-h-[6px]">
+                        {daySessions.slice(0, 3).map((s, idx) => {
+                          const ci = clients.findIndex(c => c.id === s.clientId);
+                          return <div key={idx} className="w-1.5 h-1.5 rounded-full"
+                            style={{ backgroundColor: isToday ? 'rgba(2,8,23,0.5)' : clientColors[ci % clientColors.length] }} />;
+                        })}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Panel del día seleccionado */}
+            <div className="p-4">
+              <div className="flex items-center justify-between mb-3">
+                <div>
+                  <span className="font-black capitalize text-lg">{selLabel}</span>
+                  {selSessions.length > 0 && (
+                    <span className="ml-2 text-xs text-slate-500">{selSessions.length} {selSessions.length === 1 ? 'sesión' : 'sesiones'}</span>
+                  )}
+                </div>
+                <button onClick={() => { setEditingSession(null); setShowForm(true); }}
+                  className="btn-glow px-3 py-1.5 rounded-xl flex items-center gap-1.5 text-sm">
+                  <Plus className="w-4 h-4" />Nueva sesión
+                </button>
+              </div>
+
+              {selSessions.length === 0 ? (
+                /* Sin sesiones → invitar a crear */
+                <div className="flex flex-col items-center py-8 gap-3">
+                  <div className="w-14 h-14 rounded-2xl flex items-center justify-center"
+                    style={{ background: 'rgba(163,230,53,0.06)', border: '1px solid rgba(163,230,53,0.12)' }}>
+                    <Calendar className="w-6 h-6" style={{ color: 'rgba(163,230,53,0.4)' }} />
+                  </div>
+                  <p className="text-slate-500 text-sm">Sin sesiones para este día</p>
+                  <button onClick={() => { setEditingSession(null); setShowForm(true); }}
+                    className="btn-glow px-6 py-2.5 rounded-xl flex items-center gap-2 text-sm mt-1">
+                    <Plus className="w-4 h-4" />Crear sesión
+                  </button>
+                </div>
+              ) : (
+                /* Con sesiones → lista editable */
+                <div className="space-y-2">
+                  {selSessions.map(s => {
+                    const client = clients.find(c => c.id === s.clientId);
+                    const workout = workouts.find(w => w.id === s.workoutId);
+                    const ci = clients.findIndex(c => c.id === s.clientId);
+                    const color = clientColors[ci % clientColors.length];
+                    return (
+                      <div key={s.id} className="flex items-start gap-3 p-3 bg-slate-950 rounded-xl border-l-4"
+                        style={{ borderLeftColor: color }}>
+                        {/* Hora */}
+                        <div className="min-w-[48px] text-center pt-0.5">
+                          <div className="text-base font-black" style={{ color }}>{s.time}</div>
+                        </div>
+                        {/* Info */}
+                        <div className="flex-1 min-w-0">
+                          <div className="font-bold text-sm">{client?.name || 'Cliente eliminado'}</div>
+                          <div className="flex flex-wrap gap-x-2 gap-y-0.5 mt-0.5">
+                            {s.tipo && (
+                              <span className="text-[11px] font-semibold text-slate-400">{s.tipo}</span>
+                            )}
+                            {workout && (
+                              <span className="text-[11px] text-lime-400/80 truncate max-w-[160px]">
+                                📋 {workout.name}
+                              </span>
+                            )}
+                          </div>
+                          {/* Ejercicios del entreno vinculado */}
+                          {workout && workout.exercises && workout.exercises.length > 0 && (
+                            <div className="mt-1.5 space-y-0.5">
+                              {workout.exercises.slice(0, 3).map((ex, idx) => (
+                                <div key={idx} className="text-[10px] text-slate-500">
+                                  {idx + 1}. {ex.name}
+                                  {ex.sets && ex.reps ? ` — ${ex.sets}×${ex.reps}` : ''}
+                                </div>
+                              ))}
+                              {workout.exercises.length > 3 && (
+                                <div className="text-[10px] text-slate-600">+{workout.exercises.length - 3} ejercicios más</div>
+                              )}
+                            </div>
+                          )}
+                          {s.notes && <p className="text-[11px] text-slate-500 italic mt-1">"{s.notes}"</p>}
+                        </div>
+                        {/* Acciones */}
+                        <div className="flex flex-col gap-1 flex-shrink-0">
+                          <button onClick={() => { setEditingSession(s); setShowForm(true); }}
+                            className="p-1.5 text-slate-500 hover:text-lime-400 transition rounded-lg hover:bg-slate-800">
+                            <Edit2 className="w-3.5 h-3.5" />
+                          </button>
+                          <button onClick={() => deleteSession(s.id)}
+                            className="p-1.5 text-slate-500 hover:text-red-400 transition rounded-lg hover:bg-slate-800">
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Próximas sesiones (fuera de la semana) */}
+          {upcomingSessions.length > 0 && (
+            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
+              <h3 className="font-bold mb-3 flex items-center gap-2 text-sm">
+                <TrendingUp className="w-4 h-4 text-lime-400" />Próximas semanas
+              </h3>
+              <div className="space-y-2">
+                {upcomingSessions.map(s => {
+                  const client = clients.find(c => c.id === s.clientId);
+                  const ci = clients.findIndex(c => c.id === s.clientId);
+                  const sd = new Date(s.date + 'T00:00:00');
+                  const label = sd.toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' });
+                  return (
+                    <div key={s.id} className="flex items-center gap-3 p-2.5 bg-slate-950 rounded-xl">
+                      <div className="min-w-[60px] text-center">
+                        <div className="text-[10px] font-bold text-slate-500 capitalize">{label}</div>
+                        <div className="text-sm font-black text-white">{s.time}</div>
+                      </div>
+                      <div className="w-0.5 h-7 rounded-full" style={{ backgroundColor: clientColors[ci % clientColors.length] }} />
+                      <div className="flex-1 min-w-0">
+                        <div className="font-semibold text-sm">{client?.name || '—'}</div>
+                        {s.tipo && <div className="text-[11px] text-slate-500">{s.tipo}</div>}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Accesos rápidos */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {[
+              { section: 'clientes', Icon: Users, label: 'Clientes', desc: 'Fichas, objetivos y progreso.', color: '#a3e635', bg: 'rgba(163,230,53,0.08)', border: 'rgba(163,230,53,0.2)' },
+              { section: 'entrenamientos', Icon: Dumbbell, label: 'Entrenos', desc: 'Rutinas personalizadas de funcional y TRX.', color: '#22d3ee', bg: 'rgba(34,211,238,0.08)', border: 'rgba(34,211,238,0.2)' },
+            ].map(({ section: s, Icon, label, desc, color, bg, border }) => (
+              <button key={s} onClick={() => setSection(s)}
+                className="card-lift rounded-2xl p-5 text-left group relative overflow-hidden"
+                style={{ background: 'rgba(10,18,35,0.8)', border: `1px solid rgba(255,255,255,0.07)` }}>
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"
+                  style={{ background: `radial-gradient(circle at 0 0, ${bg}, transparent 70%)` }} />
+                <div className="relative z-10">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="w-11 h-11 rounded-xl flex items-center justify-center"
+                      style={{ background: bg, border: `1px solid ${border}` }}>
+                      <Icon className="w-5 h-5" style={{ color }} />
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-slate-700 group-hover:text-white transition-colors" />
+                  </div>
+                  <h3 className="font-black text-base mb-1" style={{ color }}>{label}</h3>
+                  <p className="text-xs text-slate-500">{desc}</p>
+                </div>
+              </button>
+            ))}
+          </div>
+
+          {showForm && (
+            <SessionForm
+              clients={clients}
+              workouts={workouts}
+              date={selectedDay}
+              editing={editingSession}
+              onSave={saveSession}
+              onClose={() => { setShowForm(false); setEditingSession(null); }}
+            />
+          )}
+        </div>
+      );
+    }
+
+    function StatCard({ icon: Icon, value, label, color }) {
+      const v = {
+        lime:    { accent: '#a3e635', bg: 'rgba(163,230,53,0.07)',  border: 'rgba(163,230,53,0.2)',  glow: 'rgba(163,230,53,0.12)'  },
+        emerald: { accent: '#34d399', bg: 'rgba(52,211,153,0.07)',  border: 'rgba(52,211,153,0.2)',  glow: 'rgba(52,211,153,0.12)'  },
+        cyan:    { accent: '#22d3ee', bg: 'rgba(34,211,238,0.07)',  border: 'rgba(34,211,238,0.2)',  glow: 'rgba(34,211,238,0.12)'  },
+        violet:  { accent: '#a78bfa', bg: 'rgba(167,139,250,0.07)', border: 'rgba(167,139,250,0.2)', glow: 'rgba(167,139,250,0.12)' },
+      }[color] || { accent: '#a3e635', bg: 'rgba(163,230,53,0.07)', border: 'rgba(163,230,53,0.2)', glow: 'rgba(163,230,53,0.12)' };
+      return (
+        <div className="relative rounded-2xl p-5 card-lift overflow-hidden cursor-default"
+          style={{ background: 'rgba(10,18,35,0.9)', border: `1px solid ${v.border}`, boxShadow: `0 0 50px ${v.glow} inset` }}>
+          {/* Blob decorativo */}
+          <div className="absolute -right-5 -bottom-5 w-24 h-24 rounded-full pointer-events-none"
+            style={{ background: v.accent, opacity: 0.08, filter: 'blur(20px)' }} />
+          {/* Icono */}
+          <div className="w-11 h-11 rounded-xl mb-4 flex items-center justify-center"
+            style={{ background: v.bg, border: `1px solid ${v.border}` }}>
+            <Icon className="w-5 h-5" style={{ color: v.accent }} />
+          </div>
+          <div className="text-4xl font-black mb-0.5 leading-none" style={{ color: v.accent }}>
+            <CountUp to={value} />
+          </div>
+          <div className="text-xs text-slate-400 font-medium mt-1">{label}</div>
+        </div>
+      );
+    }
+
+    /* ── Clientes ───────────────────────────────────────────────────────── */
+    const CLIENT_GRADIENTS = [
+      'linear-gradient(135deg,#a3e635,#22d3ee)',
+      'linear-gradient(135deg,#22d3ee,#a78bfa)',
+      'linear-gradient(135deg,#f59e0b,#ef4444)',
+      'linear-gradient(135deg,#a78bfa,#ec4899)',
+      'linear-gradient(135deg,#34d399,#a3e635)',
+    ];
+
+    function Clientes({ clients, workouts, onAdd, onSelect, onDelete }) {
+      return (
+        <div className="space-y-6 animate-slide-up">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-3xl md:text-4xl font-black"><span className="gradient-text">Clientes</span></h2>
+              <p className="text-slate-500 text-sm mt-1">{clients.length} {clients.length === 1 ? 'atleta registrado' : 'atletas registrados'}</p>
+            </div>
+            <button onClick={onAdd} className="btn-glow px-4 py-2.5 rounded-xl flex items-center gap-2 text-sm">
+              <Plus className="w-4 h-4" /><span className="hidden sm:inline">Nuevo cliente</span>
+            </button>
+          </div>
+          {clients.length === 0
+            ? <EmptyState icon={Users} title="Aún no hay clientes" text="Añade a tu primer cliente para empezar a planificar entrenamientos." />
+            : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {clients.map((client, ci) => {
+                  const count = workouts.filter(w => w.clientId === client.id).length;
+                  const grad = CLIENT_GRADIENTS[ci % CLIENT_GRADIENTS.length];
+                  return (
+                    <div key={client.id} onClick={() => onSelect(client)}
+                      className={`card-lift animate-bounce-in cursor-pointer rounded-2xl p-5 group relative overflow-hidden stagger-${Math.min(ci + 1, 8)}`}
+                      style={{ background: 'rgba(10,18,35,0.9)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                      {/* Glow superior por color del cliente */}
+                      <div className="absolute top-0 left-0 w-full h-0.5 rounded-t-2xl" style={{ background: grad }} />
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-slate-950 font-black text-2xl shadow-lg"
+                          style={{ background: grad }}>
+                          {client.name.charAt(0).toUpperCase()}
+                        </div>
+                        <button onClick={(e) => { e.stopPropagation(); onDelete(client.id); }}
+                          className="text-slate-700 hover:text-red-400 p-1.5 transition rounded-lg hover:bg-red-400/10">
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                      <h3 className="font-bold text-lg mb-0.5 leading-tight">{client.name}</h3>
+                      {client.goal && (
+                        <p className="text-[11px] font-semibold mb-3 px-2.5 py-1 rounded-full inline-block"
+                          style={{ background: 'rgba(163,230,53,0.1)', color: '#a3e635' }}>{client.goal}</p>
+                      )}
+                      <div className="flex items-center justify-between text-xs text-slate-500 mt-2">
+                        <span>{count} {count === 1 ? 'entreno' : 'entrenos'}</span>
+                        <ChevronRight className="w-4 h-4 group-hover:text-lime-400 transition-colors" />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )
+          }
+        </div>
+      );
+    }
+
+    /* ── Detalle cliente ────────────────────────────────────────────────── */
+    function ClientDetail({ client, workouts, onBack, onAddWorkout, onEditWorkout, onDeleteWorkout, onDeleteClient }) {
+      return (
+        <div className="space-y-6">
+          <button onClick={onBack} className="flex items-center gap-2 text-slate-400 hover:text-lime-400 text-sm font-semibold transition">
+            <ArrowLeft className="w-4 h-4" />Volver a clientes
+          </button>
+          <div className="rounded-3xl p-6 relative overflow-hidden"
+            style={{ background: 'rgba(10,18,35,0.9)', border: '1px solid rgba(255,255,255,0.07)' }}>
+            <div className="absolute top-0 left-0 w-full h-0.5 rounded-t-3xl" style={{ background: 'linear-gradient(135deg,#a3e635,#22d3ee)' }} />
+            <div className="flex items-start gap-5">
+              <div className="w-20 h-20 rounded-2xl flex items-center justify-center text-slate-950 font-black text-3xl shadow-lg flex-shrink-0"
+                style={{ background: 'linear-gradient(135deg,#a3e635,#22d3ee)' }}>
+                {client.name.charAt(0).toUpperCase()}
+              </div>
+              <div className="flex-1">
+                <h2 className="text-2xl md:text-3xl font-black mb-2">{client.name}</h2>
+                {client.goal && (
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold mb-3"
+                    style={{ background: 'rgba(163,230,53,0.1)', color: '#a3e635', border: '1px solid rgba(163,230,53,0.2)' }}>
+                    <Target className="w-3 h-3" />{client.goal}
+                  </div>
+                )}
+                <div className="space-y-1.5 text-sm text-slate-400">
+                  {client.age && <div className="flex items-center gap-2">🎂 <span>{client.age} años</span></div>}
+                  {client.phone && <div className="flex items-center gap-2"><Phone className="w-3 h-3" />{client.phone}</div>}
+                  {client.email && <div className="flex items-center gap-2"><Mail className="w-3 h-3" />{client.email}</div>}
+                  {client.notes && <div className="text-slate-500 italic mt-2">"{client.notes}"</div>}
+                </div>
+              </div>
+              <button onClick={onDeleteClient}
+                className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-600 hover:text-red-400 transition-all"
+                style={{ background: 'rgba(255,255,255,0.04)' }}>
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+          <div className="flex items-center justify-between">
+            <h3 className="text-xl font-black">Entrenos de <span className="gradient-text">{client.name.split(' ')[0]}</span></h3>
+            <button onClick={onAddWorkout} className="btn-glow px-4 py-2 rounded-xl flex items-center gap-2 text-sm">
+              <Plus className="w-4 h-4" /><span className="hidden sm:inline">Nuevo</span>
+            </button>
+          </div>
+          {workouts.length === 0
+            ? <EmptyState icon={Dumbbell} title="Sin entrenamientos" text={`Diseña el primer entrenamiento personalizado para ${client.name.split(' ')[0]}.`} />
+            : <div className="space-y-3">{workouts.slice().reverse().map(w => <WorkoutCard key={w.id} workout={w} onEdit={() => onEditWorkout(w)} onDelete={() => onDeleteWorkout(w.id)} />)}</div>
+          }
+        </div>
+      );
+    }
+
+    /* ── Entrenamientos ─────────────────────────────────────────────────── */
+    function Entrenamientos({ workouts, clients, onAdd, onEdit, onDelete }) {
+      const [filterClient, setFilterClient] = useState('all');
+      const filtered = filterClient === 'all' ? workouts : workouts.filter(w => w.clientId === filterClient);
+      return (
+        <div className="space-y-6 animate-slide-up">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-3xl md:text-4xl font-black"><span className="gradient-text">Entrenos</span></h2>
+              <p className="text-slate-500 text-sm mt-1">{filtered.length} {filtered.length === 1 ? 'rutina guardada' : 'rutinas guardadas'}</p>
+            </div>
+            <button onClick={onAdd} disabled={clients.length === 0}
+              className="btn-glow disabled:opacity-40 px-4 py-2.5 rounded-xl flex items-center gap-2 text-sm">
+              <Plus className="w-4 h-4" /><span className="hidden sm:inline">Nuevo entreno</span>
+            </button>
+          </div>
+          {clients.length === 0
+            ? <EmptyState icon={Users} title="Primero añade clientes" text="Necesitas tener al menos un cliente para crear entrenamientos." />
+            : (
+              <>
+                <div className="flex gap-2 overflow-x-auto pb-2">
+                  <button onClick={() => setFilterClient('all')}
+                    className={`px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all ${filterClient === 'all' ? 'nav-active' : 'text-slate-500 hover:text-slate-200 hover:bg-white/5'}`}
+                    style={filterClient === 'all' ? {} : { border: '1px solid rgba(255,255,255,0.07)' }}>
+                    Todos
+                  </button>
+                  {clients.map(c => (
+                    <button key={c.id} onClick={() => setFilterClient(c.id)}
+                      className={`px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all ${filterClient === c.id ? 'nav-active' : 'text-slate-500 hover:text-slate-200 hover:bg-white/5'}`}
+                      style={filterClient === c.id ? {} : { border: '1px solid rgba(255,255,255,0.07)' }}>
+                      {c.name}
+                    </button>
+                  ))}
+                </div>
+                {filtered.length === 0
+                  ? <EmptyState icon={Dumbbell} title="Sin entrenamientos" text="Crea el primer entrenamiento desde el botón de arriba." />
+                  : <div className="space-y-3">{filtered.slice().reverse().map(w => {
+                      const client = clients.find(c => c.id === w.clientId);
+                      return <WorkoutCard key={w.id} workout={w} clientName={client?.name} onEdit={() => onEdit(w)} onDelete={() => onDelete(w.id)} />;
+                    })}</div>
+                }
+              </>
+            )
+          }
+        </div>
+      );
+    }
+
+    function WorkoutCard({ workout, clientName, onEdit, onDelete }) {
+      const [expanded, setExpanded] = useState(false);
+      const TYPE_STYLE = {
+        'Funcional': { color: '#a3e635', bg: 'rgba(163,230,53,0.1)', border: 'rgba(163,230,53,0.25)' },
+        'TRX':       { color: '#22d3ee', bg: 'rgba(34,211,238,0.1)', border: 'rgba(34,211,238,0.25)' },
+        'Mixto':     { color: '#34d399', bg: 'rgba(52,211,153,0.1)', border: 'rgba(52,211,153,0.25)' },
+      };
+      const ts = TYPE_STYLE[workout.type] || TYPE_STYLE['Funcional'];
+      return (
+        <div className="rounded-2xl overflow-hidden card-lift"
+          style={{ background: 'rgba(10,18,35,0.9)', border: '1px solid rgba(255,255,255,0.07)' }}>
+          {/* Barra de color por tipo */}
+          <div className="h-0.5" style={{ background: ts.color }} />
+          <div className="p-4 md:p-5">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex-1 min-w-0">
+                <div className="flex flex-wrap items-center gap-2 mb-2.5">
+                  <span className="text-[10px] font-bold px-2.5 py-1 rounded-full"
+                    style={{ color: ts.color, background: ts.bg, border: `1px solid ${ts.border}` }}>
+                    {workout.type || 'Funcional'}
+                  </span>
+                  <span className="text-xs text-slate-600">{new Date(workout.date).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
+                </div>
+                <h3 className="font-black text-lg mb-1 truncate leading-tight">{workout.name}</h3>
+                {clientName && <p className="text-xs text-slate-500 mb-2.5">👤 {clientName}</p>}
+                <div className="flex flex-wrap gap-3 text-xs text-slate-500">
+                  <span className="flex items-center gap-1.5">
+                    <Dumbbell className="w-3 h-3" style={{ color: ts.color }} />
+                    {workout.exercises?.length || 0} ejercicios
+                  </span>
+                  {workout.duration && <span>⏱ {workout.duration} min</span>}
+                </div>
+              </div>
+              <div className="flex gap-1 flex-shrink-0">
+                <button onClick={onEdit}
+                  className="w-8 h-8 rounded-xl flex items-center justify-center text-slate-500 hover:text-lime-400 transition-all"
+                  style={{ background: 'rgba(255,255,255,0.04)' }}>
+                  <Edit2 className="w-3.5 h-3.5" />
+                </button>
+                <button onClick={onDelete}
+                  className="w-8 h-8 rounded-xl flex items-center justify-center text-slate-500 hover:text-red-400 transition-all"
+                  style={{ background: 'rgba(255,255,255,0.04)' }}>
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+            {workout.exercises && workout.exercises.length > 0 && (
+              <button onClick={() => setExpanded(!expanded)}
+                className="mt-3 text-xs font-semibold flex items-center gap-1 transition-colors"
+                style={{ color: ts.color }}>
+                {expanded ? 'Ocultar' : 'Ver'} ejercicios
+                <ChevronRight className={`w-3 h-3 transition-transform ${expanded ? 'rotate-90' : ''}`} />
+              </button>
+            )}
+          </div>
+          {expanded && workout.exercises && (
+            <div className="p-4 space-y-2" style={{ borderTop: '1px solid rgba(255,255,255,0.06)', background: 'rgba(2,8,23,0.5)' }}>
+              {workout.exercises.map((ex, i) => (
+                <div key={i} className="flex items-center gap-3 p-3 rounded-xl"
+                  style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)' }}>
+                  <div className="w-7 h-7 rounded-lg flex items-center justify-center font-black text-xs flex-shrink-0"
+                    style={{ background: ts.bg, color: ts.color, border: `1px solid ${ts.border}` }}>{i + 1}</div>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-semibold text-sm truncate">{ex.name}</div>
+                    <div className="text-xs text-slate-500 flex flex-wrap gap-2 mt-0.5">
+                      <span>{ex.sets}×{ex.reps}</span>
+                      {ex.weight > 0 && <span>· {ex.weight} kg</span>}
+                      {ex.rest && <span>· {ex.rest}s desc.</span>}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    /* ── Analíticas ─────────────────────────────────────────────────────── */
+    function Analiticas({ clients, workouts }) {
+      const [filterId, setFilterId] = useState('all');
+
+      const filtered = filterId === 'all' ? workouts : workouts.filter(w => w.clientId === filterId);
+      const client = clients.find(c => c.id === filterId);
+      const COLORS = ['#a3e635', '#22d3ee', '#34d399'];
+
+      // ── Recopilar todos los ejercicios de los entrenamientos filtrados ──
+      const allExercises = [];
+      filtered.forEach(w => { w.exercises?.forEach(ex => allExercises.push(ex)); });
+
+      // ── VOLUMEN: series × reps ──
+      const totalVolumen = allExercises.reduce((s, ex) => s + (ex.sets || 0) * (ex.reps || 0), 0);
+      const volumenPorMes = {};
+      filtered.forEach(w => {
+        const d = new Date(w.date);
+        const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2,'0')}`;
+        const vol = w.exercises?.reduce((s, ex) => s + (ex.sets || 0) * (ex.reps || 0), 0) || 0;
+        volumenPorMes[key] = (volumenPorMes[key] || 0) + vol;
+      });
+      const volumenChart = Object.entries(volumenPorMes).sort().slice(-6).map(([k, v]) => {
+        const m = parseInt(k.split('-')[1]) - 1;
+        return { month: ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'][m], vol: v };
+      });
+
+      // ── INTENSIDAD: RPE medio (1–10) ──
+      const exsConRPE = allExercises.filter(ex => ex.intensidad && ex.intensidad >= 1);
+      const avgRPE = exsConRPE.length
+        ? (exsConRPE.reduce((s, ex) => s + Number(ex.intensidad), 0) / exsConRPE.length).toFixed(1)
+        : null;
+      const rpeColor = !avgRPE ? '#64748b'
+        : avgRPE < 4 ? '#22d3ee' : avgRPE < 6 ? '#a3e635' : avgRPE < 8 ? '#f59e0b' : '#ef4444';
+      const rpeLabel = !avgRPE ? '—'
+        : avgRPE < 4 ? 'Muy fácil' : avgRPE < 6 ? 'Moderada' : avgRPE < 8 ? 'Alta' : 'Máxima';
+      const rpeByWorkout = filtered.map(w => {
+        const exs = (w.exercises || []).filter(ex => ex.intensidad);
+        const avg = exs.length ? exs.reduce((s, ex) => s + Number(ex.intensidad), 0) / exs.length : null;
+        const d = new Date(w.date);
+        return { month: ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'][d.getMonth()], rpe: avg ? Math.round(avg * 10) / 10 : 0 };
+      }).filter(x => x.rpe > 0).slice(-6);
+
+      // ── RESISTENCIA: tonelaje + desglose por tipo ──
+      let tonelaje = 0;
+      const tipoResCount = {};
+      const trxInclinaciones = [];
+      const gomaLevels = {};
+      allExercises.forEach(ex => {
+        const tipo = ex.tipoResistencia || 'Peso libre';
+        tipoResCount[tipo] = (tipoResCount[tipo] || 0) + 1;
+        tonelaje += (ex.sets || 0) * (ex.reps || 0) * (ex.weight || 0);
+        if (tipo === 'TRX' && ex.inclinacion) trxInclinaciones.push(Number(ex.inclinacion));
+        if (tipo === 'Goma elástica' && ex.nivelGoma) gomaLevels[ex.nivelGoma] = (gomaLevels[ex.nivelGoma] || 0) + 1;
+      });
+      const avgTRX = trxInclinaciones.length
+        ? Math.round(trxInclinaciones.reduce((s, v) => s + v, 0) / trxInclinaciones.length) : null;
+      const tipoResData = Object.entries(tipoResCount).map(([name, value]) => ({ name, value }));
+
+      // ── FATIGA: volumen por grupo muscular ──
+      const musculoVol = {};
+      allExercises.forEach(ex => {
+        if (ex.musculo) {
+          musculoVol[ex.musculo] = (musculoVol[ex.musculo] || 0) + (ex.sets || 0) * (ex.reps || 0);
+        }
+      });
+      const fatigaData = Object.entries(musculoVol)
+        .sort((a, b) => b[1] - a[1])
+        .map(([name, count]) => ({ name, count }));
+
+      // ── Datos mensuales (sesiones) ──
+      const monthlyData = {};
+      filtered.forEach(w => {
+        const d = new Date(w.date);
+        const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+        monthlyData[key] = (monthlyData[key] || 0) + 1;
+      });
+      const monthlyChart = Object.entries(monthlyData).sort().slice(-6).map(([k, v]) => {
+        const m = parseInt(k.split('-')[1]) - 1;
+        return { month: ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'][m], entrenamientos: v };
+      });
+
+      // Por tipo
+      const typeCount = {};
+      filtered.forEach(w => { const t = w.type || 'Funcional'; typeCount[t] = (typeCount[t] || 0) + 1; });
+      const typeData = Object.entries(typeCount).map(([name, value]) => ({ name, value }));
+
+      // Top clientes (solo vista global)
+      const clientCount = {};
+      workouts.forEach(w => { clientCount[w.clientId] = (clientCount[w.clientId] || 0) + 1; });
+      const topClients = Object.entries(clientCount)
+        .map(([id, count]) => ({ name: clients.find(c => c.id === id)?.name || null, count }))
+        .filter(c => c.name).sort((a, b) => b.count - a.count).slice(0, 5);
+
+      // Kg totales (legacy)
+      let totalKg = tonelaje;
+
+      // Duración media y último entreno (vista individual)
+      const withDuration = filtered.filter(w => w.duration);
+      const avgDuration = withDuration.length
+        ? Math.round(withDuration.reduce((s, w) => s + Number(w.duration), 0) / withDuration.length) : 0;
+      const sorted = filtered.slice().sort((a, b) => new Date(b.date) - new Date(a.date));
+      const daysSinceLast = sorted[0]
+        ? Math.floor((new Date() - new Date(sorted[0].date)) / 86400000) : null;
+      const lastLabel = daysSinceLast === null ? '—' : daysSinceLast === 0 ? 'Hoy' : daysSinceLast === 1 ? 'Ayer' : `${daysSinceLast}d`;
+
+      // ── GRÁFICA RESUMEN POR FECHA ──
+      const workoutsByDate = {};
+      filtered.forEach(w => {
+        if (!workoutsByDate[w.date]) workoutsByDate[w.date] = [];
+        workoutsByDate[w.date].push(w);
+      });
+      const chartData = Object.entries(workoutsByDate)
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([date, ws]) => {
+          const exs = ws.flatMap(w => w.exercises || []);
+          const vol = exs.reduce((s, ex) => s + (ex.sets||0)*(ex.reps||0), 0);
+          const exsRPE = exs.filter(ex => ex.intensidad && ex.intensidad >= 1);
+          const inten = exsRPE.length ? exsRPE.reduce((s, ex) => s + Number(ex.intensidad), 0) / exsRPE.length : 0;
+          const res = exs.reduce((s, ex) => s + (ex.sets||0)*(ex.reps||0)*(ex.weight||0), 0);
+          return { date, volumen: vol, intensidad: Math.round(inten * 10) / 10, resistencia: Math.round(res) };
+        });
+
+      return (
+        <div className="space-y-6 animate-slide-up">
+          <div>
+            <h2 className="text-3xl md:text-4xl font-black"><span className="gradient-text-violet">Analíticas</span></h2>
+            <p className="text-slate-500 text-sm mt-1">Rendimiento y métricas de tus atletas</p>
+          </div>
+
+          {/* Filtro por cliente */}
+          {clients.length > 0 && (
+            <div className="flex gap-2 overflow-x-auto pb-1">
+              <button onClick={() => setFilterId('all')}
+                className={`px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all ${filterId === 'all' ? 'nav-active' : 'text-slate-500 hover:text-slate-200 hover:bg-white/5'}`}
+                style={filterId === 'all' ? {} : { border: '1px solid rgba(255,255,255,0.07)' }}>
+                Todos
+              </button>
+              {clients.map((c, ci) => (
+                <button key={c.id} onClick={() => setFilterId(c.id)}
+                  className={`px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all ${filterId === c.id ? 'nav-active' : 'text-slate-500 hover:text-slate-200 hover:bg-white/5'}`}
+                  style={filterId === c.id ? {} : { border: '1px solid rgba(255,255,255,0.07)' }}>
+                  {c.name}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {workouts.length === 0 ? (
+            <EmptyState icon={BarChart3} title="Sin datos aún" text="Las analíticas aparecerán cuando registres entrenamientos." />
+          ) : filtered.length === 0 ? (
+            <EmptyState icon={Dumbbell} title="Sin entrenamientos" text={`${client?.name} aún no tiene entrenamientos registrados.`} />
+          ) : (
+            <>
+              {/* Banner cliente seleccionado */}
+              {client && (
+                <div className="rounded-2xl p-4 flex items-center gap-4"
+                  style={{ background: 'rgba(10,18,35,0.9)', border: '1px solid rgba(167,139,250,0.25)', boxShadow: '0 0 30px rgba(167,139,250,0.06) inset' }}>
+                  <div className="w-14 h-14 rounded-xl flex items-center justify-center text-slate-950 font-black text-2xl flex-shrink-0"
+                    style={{ background: 'linear-gradient(135deg,#a78bfa,#22d3ee)' }}>
+                    {client.name.charAt(0).toUpperCase()}
+                  </div>
+                  <div>
+                    <div className="font-black text-lg">{client.name}</div>
+                    {client.goal && <div className="text-xs font-semibold" style={{ color: '#a78bfa' }}>{client.goal}</div>}
+                  </div>
+                </div>
+              )}
+
+              {/* Stats generales */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {filterId === 'all' ? (
+                  <>
+                    <MiniStat icon={Users} label="Clientes" value={clients.length} />
+                    <MiniStat icon={Dumbbell} label="Sesiones totales" value={workouts.length} />
+                    <MiniStat icon={TrendingUp} label="Tonelaje total" value={totalKg.toLocaleString('es-ES')} suffix="kg" />
+                    <MiniStat icon={Award} label="Prom./cliente" value={clients.length ? (workouts.length / clients.length).toFixed(1) : 0} />
+                  </>
+                ) : (
+                  <>
+                    <MiniStat icon={Dumbbell} label="Sesiones" value={filtered.length} />
+                    <MiniStat icon={TrendingUp} label="Tonelaje" value={totalKg.toLocaleString('es-ES')} suffix="kg" />
+                    <MiniStat icon={Calendar} label="Último entreno" value={lastLabel} />
+                    <MiniStat icon={Activity} label="Duración media" value={avgDuration || '—'} suffix={avgDuration ? 'min' : ''} />
+                  </>
+                )}
+              </div>
+
+              {/* ── 4 CAJAS ANALÍTICAS ── */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+                {/* VOLUMEN */}
+                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
+                  <div className="flex items-center gap-2 mb-1">
+                    <div className="w-8 h-8 bg-lime-400/10 rounded-lg flex items-center justify-center">
+                      <BarChart3 className="w-4 h-4 text-lime-400" />
+                    </div>
+                    <span className="font-black text-sm">Volumen</span>
+                  </div>
+                  <p className="text-xs text-slate-500 mb-3">Series × Repeticiones totales</p>
+                  <div className="text-3xl font-black text-lime-400 mb-1">
+                    {totalVolumen.toLocaleString('es-ES')}
+                    <span className="text-sm text-slate-400 font-normal ml-1">reps</span>
+                  </div>
+                  <div className="text-xs text-slate-500 mb-3">{allExercises.length} ejercicios registrados</div>
+                  {volumenChart.length > 0 && <BarChartCSS data={volumenChart} labelKey="month" valueKey="vol" />}
+                  {volumenChart.length === 0 && <p className="text-xs text-slate-600 italic">Sin datos suficientes aún</p>}
+                </div>
+
+                {/* INTENSIDAD */}
+                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
+                  <div className="flex items-center gap-2 mb-1">
+                    <div className="w-8 h-8 bg-amber-400/10 rounded-lg flex items-center justify-center">
+                      <Zap className="w-4 h-4 text-amber-400" />
+                    </div>
+                    <span className="font-black text-sm">Intensidad</span>
+                  </div>
+                  <p className="text-xs text-slate-500 mb-3">Esfuerzo percibido (RPE 1–10)</p>
+                  {avgRPE ? (
+                    <>
+                      <div className="text-3xl font-black mb-1" style={{ color: rpeColor }}>
+                        {avgRPE}
+                        <span className="text-sm text-slate-400 font-normal ml-1">/ 10</span>
+                      </div>
+                      <div className="text-xs font-bold mb-3" style={{ color: rpeColor }}>{rpeLabel}</div>
+                      {/* Barra de intensidad */}
+                      <div className="w-full bg-slate-800 rounded-full h-3 mb-3">
+                        <div className="h-3 rounded-full transition-all" style={{ width: `${(avgRPE / 10) * 100}%`, backgroundColor: rpeColor }} />
+                      </div>
+                      {/* Mini leyenda */}
+                      <div className="flex justify-between text-[10px] text-slate-600">
+                        <span>1 Mínimo</span><span>5 Moderado</span><span>10 Máximo</span>
+                      </div>
+                      {exsConRPE.length < allExercises.length && (
+                        <p className="text-[10px] text-slate-600 mt-2 italic">
+                          {allExercises.length - exsConRPE.length} ejercicio(s) sin RPE registrado
+                        </p>
+                      )}
+                    </>
+                  ) : (
+                    <div className="py-4">
+                      <p className="text-slate-500 text-sm">Sin datos de RPE aún</p>
+                      <p className="text-xs text-slate-600 mt-1">Añade la intensidad (RPE 1–10) al crear ejercicios</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* RESISTENCIA */}
+                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
+                  <div className="flex items-center gap-2 mb-1">
+                    <div className="w-8 h-8 bg-cyan-400/10 rounded-lg flex items-center justify-center">
+                      <TrendingUp className="w-4 h-4 text-cyan-400" />
+                    </div>
+                    <span className="font-black text-sm">Resistencia</span>
+                  </div>
+                  <p className="text-xs text-slate-500 mb-3">Kg · Inclinación TRX · Gomas</p>
+                  <div className="text-3xl font-black text-cyan-400 mb-1">
+                    {tonelaje.toLocaleString('es-ES')}
+                    <span className="text-sm text-slate-400 font-normal ml-1">kg tonelaje</span>
+                  </div>
+                  {avgTRX && <div className="text-xs text-cyan-300 mb-2">Inclinación TRX media: <strong>{avgTRX}%</strong></div>}
+                  {Object.keys(gomaLevels).length > 0 && (
+                    <div className="text-xs text-slate-400 mb-2">
+                      Gomas: {Object.entries(gomaLevels).map(([n, c]) => `${n} (${c})`).join(' · ')}
+                    </div>
+                  )}
+                  {tipoResData.length > 0 ? (
+                    <div className="mt-3 space-y-1.5">
+                      {tipoResData.map((t, i) => (
+                        <div key={i} className="flex items-center gap-2 text-xs">
+                          <span className="text-slate-400 w-24 truncate">{t.name}</span>
+                          <div className="flex-1 bg-slate-800 rounded-full h-1.5">
+                            <div className="h-1.5 rounded-full bg-cyan-400" style={{ width: `${(t.value / allExercises.length) * 100}%` }} />
+                          </div>
+                          <span className="text-slate-500 w-6 text-right">{t.value}</span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-xs text-slate-600 italic mt-2">Sin datos de resistencia aún</p>
+                  )}
+                </div>
+
+                {/* FATIGA MUSCULAR */}
+                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
+                  <div className="flex items-center gap-2 mb-1">
+                    <div className="w-8 h-8 bg-purple-400/10 rounded-lg flex items-center justify-center">
+                      <Activity className="w-4 h-4 text-purple-400" />
+                    </div>
+                    <span className="font-black text-sm">Fatiga muscular</span>
+                  </div>
+                  <p className="text-xs text-slate-500 mb-3">Volumen por grupo muscular</p>
+                  {fatigaData.length > 0 ? (
+                    <div className="space-y-2">
+                      {fatigaData.map((m, i) => {
+                        const pct = (m.count / fatigaData[0].count) * 100;
+                        const intensity = pct > 70 ? '#ef4444' : pct > 40 ? '#f59e0b' : '#a78bfa';
+                        return (
+                          <div key={i} className="flex items-center gap-2">
+                            <span className="text-xs text-slate-300 w-20 truncate">{m.name}</span>
+                            <div className="flex-1 bg-slate-800 rounded-full h-4 overflow-hidden">
+                              <div className="h-4 rounded-full transition-all flex items-center pl-2"
+                                style={{ width: `${pct}%`, backgroundColor: intensity }}>
+                              </div>
+                            </div>
+                            <span className="text-xs font-bold text-slate-400 w-10 text-right">{m.count}</span>
+                          </div>
+                        );
+                      })}
+                      <p className="text-[10px] text-slate-600 mt-2">Rojo = más cargado · Lila = menor carga</p>
+                    </div>
+                  ) : (
+                    <div className="py-4">
+                      <p className="text-slate-500 text-sm">Sin datos musculares aún</p>
+                      <p className="text-xs text-slate-600 mt-1">Asigna grupo muscular a cada ejercicio al crearlo</p>
+                    </div>
+                  )}
+                </div>
+
+              </div>
+              {/* ── FIN 4 CAJAS ── */}
+
+              {/* ── GRÁFICA RESUMEN INTERACTIVA ── */}
+              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
+                <div className="flex items-center gap-2 mb-1">
+                  <div className="w-8 h-8 bg-lime-400/10 rounded-lg flex items-center justify-center">
+                    <TrendingUp className="w-4 h-4 text-lime-400" />
+                  </div>
+                  <span className="font-black text-sm">Evolución de métricas</span>
+                </div>
+                <p className="text-xs text-slate-500 mb-4">Pasa el cursor sobre la gráfica para ver los datos por sesión</p>
+                <LineChartInteractive data={chartData} />
+                <div className="flex flex-wrap gap-5 mt-4 pt-3 border-t border-slate-800">
+                  {[
+                    { color: '#a3e635', label: 'Volumen (reps)' },
+                    { color: '#f59e0b', label: 'Intensidad (RPE)' },
+                    { color: '#22d3ee', label: 'Resistencia (kg tonelaje)' },
+                  ].map(m => (
+                    <div key={m.label} className="flex items-center gap-2 text-xs">
+                      <div className="w-6 h-0.5 rounded-full" style={{ backgroundColor: m.color }} />
+                      <span className="text-slate-400">{m.label}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Gráficas */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {monthlyChart.length > 0 && (
+                  <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
+                    <h3 className="font-bold mb-4 flex items-center gap-2">
+                      <TrendingUp className="w-5 h-5 text-lime-400" />Entrenamientos por mes
+                    </h3>
+                    <BarChartCSS data={monthlyChart} labelKey="month" valueKey="entrenamientos" />
+                  </div>
+                )}
+                {typeData.length > 0 && (
+                  <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
+                    <h3 className="font-bold mb-4 flex items-center gap-2">
+                      <Activity className="w-5 h-5 text-lime-400" />Por tipo de entrenamiento
+                    </h3>
+                    <PieChartCSS data={typeData} colors={COLORS} />
+                  </div>
+                )}
+              </div>
+
+              {/* Top clientes — solo vista global */}
+              {filterId === 'all' && topClients.length > 0 && (
+                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
+                  <h3 className="font-bold mb-4 flex items-center gap-2">
+                    <Award className="w-5 h-5 text-lime-400" />Top clientes más activos
+                  </h3>
+                  <HBarChartCSS data={topClients} nameKey="name" valueKey="count" />
+                </div>
+              )}
+
+              {/* Historial — solo vista individual */}
+              {filterId !== 'all' && (
+                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
+                  <h3 className="font-bold mb-4 flex items-center gap-2">
+                    <Dumbbell className="w-5 h-5 text-lime-400" />Historial de entrenamientos
+                  </h3>
+                  <div className="space-y-2">
+                    {sorted.map(w => (
+                      <div key={w.id} className="flex items-center justify-between p-3 bg-slate-950 rounded-lg">
+                        <div>
+                          <div className="font-semibold text-sm">{w.name}</div>
+                          <div className="text-xs text-slate-400">
+                            {new Date(w.date).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })}
+                            {w.type && <span className="ml-2 text-lime-400/70">· {w.type}</span>}
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-xs text-lime-400 font-semibold">{w.exercises?.length || 0} ej.</div>
+                          {w.duration && <div className="text-xs text-slate-500">⏱️ {w.duration}min</div>}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      );
+    }
+
+    function MiniStat({ icon: Icon, label, value, suffix }) {
+      return (
+        <div className="rounded-xl p-4" style={{ background: 'rgba(10,18,35,0.8)', border: '1px solid rgba(255,255,255,0.07)' }}>
+          <Icon className="w-4 h-4 mb-2" style={{ color: '#a3e635' }} />
+          <div className="text-xl md:text-2xl font-black truncate text-white">
+            {value}{suffix && <span className="text-xs text-slate-500 ml-1">{suffix}</span>}
+          </div>
+          <div className="text-[11px] text-slate-500 mt-0.5">{label}</div>
+        </div>
+      );
+    }
+
+    function LineChartInteractive({ data }) {
+      const [hoverIdx, setHoverIdx] = useState(null);
+
+      if (!data || data.length === 0) return (
+        <p className="text-xs text-slate-600 italic py-6 text-center">
+          Sin datos suficientes — registra entrenamientos con ejercicios para ver la evolución
+        </p>
+      );
+
+      const W = 600, H = 220;
+      const PAD = { top: 24, right: 24, bottom: 44, left: 24 };
+      const cW = W - PAD.left - PAD.right;
+      const cH = H - PAD.top - PAD.bottom;
+      const n = data.length;
+
+      const xOf = (i) => n < 2 ? PAD.left + cW / 2 : PAD.left + (i / (n - 1)) * cW;
+      const maxVol = Math.max(...data.map(d => d.volumen), 1);
+      const maxInt = Math.max(...data.map(d => d.intensidad), 10);
+      const maxRes = Math.max(...data.map(d => d.resistencia), 1);
+      const yOf = (val, max) => PAD.top + cH - (val / max) * cH;
+
+      const METRICS = [
+        { key: 'volumen',     max: maxVol, color: '#a3e635', label: 'Volumen' },
+        { key: 'intensidad',  max: maxInt, color: '#f59e0b', label: 'Intensidad' },
+        { key: 'resistencia', max: maxRes, color: '#22d3ee', label: 'Resistencia' },
+      ];
+
+      // Curva suavizada (catmull-rom → cubic bezier)
+      const smoothPath = (key, max) => {
+        if (n < 2) return '';
+        const pts = data.map((d, i) => [xOf(i), yOf(d[key], max)]);
+        let p = `M${pts[0][0]},${pts[0][1]}`;
+        for (let i = 0; i < pts.length - 1; i++) {
+          const x1 = pts[i][0] + (pts[i+1][0] - (i > 0 ? pts[i-1][0] : pts[i][0])) / 6;
+          const y1 = pts[i][1] + (pts[i+1][1] - (i > 0 ? pts[i-1][1] : pts[i][1])) / 6;
+          const x2 = pts[i+1][0] - (i < pts.length-2 ? pts[i+2][0] - pts[i][0] : pts[i+1][0] - pts[i][0]) / 6;
+          const y2 = pts[i+1][1] - (i < pts.length-2 ? pts[i+2][1] - pts[i][1] : pts[i+1][1] - pts[i][1]) / 6;
+          p += ` C${x1},${y1} ${x2},${y2} ${pts[i+1][0]},${pts[i+1][1]}`;
+        }
+        return p;
+      };
+
+      // Área rellena bajo cada línea
+      const areaPath = (key, max) => {
+        if (n < 2) return '';
+        const pts = data.map((d, i) => [xOf(i), yOf(d[key], max)]);
+        let p = `M${pts[0][0]},${PAD.top + cH}`;
+        p += ` L${pts[0][0]},${pts[0][1]}`;
+        for (let i = 0; i < pts.length - 1; i++) {
+          const x1 = pts[i][0] + (pts[i+1][0] - (i > 0 ? pts[i-1][0] : pts[i][0])) / 6;
+          const y1 = pts[i][1] + (pts[i+1][1] - (i > 0 ? pts[i-1][1] : pts[i][1])) / 6;
+          const x2 = pts[i+1][0] - (i < pts.length-2 ? pts[i+2][0] - pts[i][0] : pts[i+1][0] - pts[i][0]) / 6;
+          const y2 = pts[i+1][1] - (i < pts.length-2 ? pts[i+2][1] - pts[i][1] : pts[i+1][1] - pts[i][1]) / 6;
+          p += ` C${x1},${y1} ${x2},${y2} ${pts[i+1][0]},${pts[i+1][1]}`;
+        }
+        p += ` L${pts[pts.length-1][0]},${PAD.top + cH} Z`;
+        return p;
+      };
+
+      const fmtDate = (dateStr) => {
+        const dt = new Date(dateStr + 'T00:00:00');
+        return dt.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+      };
+      const showXLabel = (i) => n <= 7 || i === 0 || i === n-1 || i % Math.ceil(n / 6) === 0;
+
+      const hd = hoverIdx !== null ? data[hoverIdx] : null;
+      const tooltipFlip = hoverIdx !== null && hoverIdx > n * 0.6;
+
+      return (
+        <div className="relative select-none" onMouseLeave={() => setHoverIdx(null)}>
+          <svg viewBox={`0 0 ${W} ${H}`} className="w-full overflow-visible">
+            <defs>
+              {METRICS.map(m => (
+                <linearGradient key={m.key} id={`grad-${m.key}`} x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor={m.color} stopOpacity="0.18" />
+                  <stop offset="100%" stopColor={m.color} stopOpacity="0" />
+                </linearGradient>
+              ))}
+            </defs>
+
+            {/* Grid */}
+            {[0, 0.25, 0.5, 0.75, 1].map((v, i) => (
+              <line key={i} x1={PAD.left} x2={W - PAD.right}
+                y1={PAD.top + cH * (1-v)} y2={PAD.top + cH * (1-v)}
+                stroke="#1e293b" strokeWidth="1" />
+            ))}
+
+            {/* Áreas */}
+            {METRICS.map(m => (
+              <path key={`area-${m.key}`} d={areaPath(m.key, m.max)}
+                fill={`url(#grad-${m.key})`}
+                opacity={hoverIdx !== null ? 0.3 : 0.7} />
+            ))}
+
+            {/* Líneas */}
+            {METRICS.map(m => (
+              <path key={m.key} d={smoothPath(m.key, m.max)} fill="none"
+                stroke={m.color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+                opacity={hoverIdx !== null ? 0.4 : 1} />
+            ))}
+
+            {/* Puntos */}
+            {data.map((d, i) =>
+              METRICS.map(m => (
+                <circle key={`${m.key}-${i}`} cx={xOf(i)} cy={yOf(d[m.key], m.max)}
+                  r={hoverIdx === i ? 6 : 3.5}
+                  fill={hoverIdx === i ? m.color : '#0f172a'}
+                  stroke={m.color} strokeWidth="2"
+                  opacity={hoverIdx !== null && hoverIdx !== i ? 0.2 : 1} />
+              ))
+            )}
+
+            {/* Línea vertical hover */}
+            {hoverIdx !== null && (
+              <line x1={xOf(hoverIdx)} x2={xOf(hoverIdx)}
+                y1={PAD.top} y2={PAD.top + cH}
+                stroke="#ffffff" strokeWidth="1" strokeDasharray="4,3" opacity="0.2" />
+            )}
+
+            {/* Etiquetas eje X */}
+            {data.map((d, i) => showXLabel(i) && (
+              <text key={i} x={xOf(i)} y={H - 5} textAnchor="middle" fill="#475569" fontSize="9">
+                {fmtDate(d.date)}
+              </text>
+            ))}
+
+            {/* Zonas hover invisibles */}
+            {data.map((d, i) => {
+              const x1 = i === 0 ? PAD.left : (xOf(i-1) + xOf(i)) / 2;
+              const x2 = i === n-1 ? PAD.left + cW : (xOf(i) + xOf(i+1)) / 2;
+              return (
+                <rect key={`hz${i}`} x={x1} y={PAD.top} width={x2-x1} height={cH}
+                  fill="transparent" onMouseEnter={() => setHoverIdx(i)} />
+              );
+            })}
+          </svg>
+
+          {/* Tooltip */}
+          {hd && (
+            <div className="absolute top-0 pointer-events-none z-20"
+              style={{
+                left: `${(xOf(hoverIdx) / W) * 100}%`,
+                transform: tooltipFlip ? 'translate(-108%, 4px)' : 'translate(10px, 4px)',
+              }}>
+              <div className="bg-slate-800 border border-slate-600 rounded-xl p-3 shadow-2xl min-w-[156px]">
+                <div className="text-[11px] font-bold text-white mb-2 pb-1.5 border-b border-slate-700">
+                  📅 {fmtDate(hd.date)}
+                </div>
+                {METRICS.map(m => (
+                  <div key={m.key} className="flex items-center justify-between gap-3 mb-1.5 last:mb-0">
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: m.color }} />
+                      <span className="text-[10px] text-slate-400">{m.label}</span>
+                    </div>
+                    <span className="text-[11px] font-black tabular-nums" style={{ color: m.color }}>
+                      {m.key === 'intensidad'
+                        ? (hd[m.key] > 0 ? `${hd[m.key]} RPE` : '—')
+                        : m.key === 'resistencia'
+                        ? `${hd[m.key].toLocaleString('es-ES')} kg`
+                        : hd[m.key].toLocaleString('es-ES')}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    function EmptyState({ icon: Icon, title, text }) {
+      return (
+        <div className="rounded-3xl p-12 text-center animate-fade-in"
+          style={{ background: 'rgba(10,18,35,0.6)', border: '1px dashed rgba(255,255,255,0.08)' }}>
+          <div className="w-20 h-20 rounded-3xl mx-auto mb-5 flex items-center justify-center"
+            style={{ background: 'rgba(163,230,53,0.05)', border: '1px solid rgba(163,230,53,0.1)' }}>
+            <Icon className="w-9 h-9" style={{ color: 'rgba(163,230,53,0.3)' }} />
+          </div>
+          <h3 className="font-black text-xl mb-2">{title}</h3>
+          <p className="text-sm text-slate-500 max-w-xs mx-auto leading-relaxed">{text}</p>
+        </div>
+      );
+    }
+
+    /* ── Facturas ───────────────────────────────────────────────────────── */
+    function Facturas({ clients, sessions, workouts }) {
+      const { useState: us, useEffect: ue } = React;
+      const [periodo, setPeriodo] = us('mes');
+      const [cobradas, setCobradas] = us(() => {
+        try { return JSON.parse(localStorage.getItem('facturas_cobradas') || '{}'); } catch { return {}; }
+      });
+
+      ue(() => {
+        localStorage.setItem('facturas_cobradas', JSON.stringify(cobradas));
+      }, [cobradas]);
+
+      const now = new Date();
+
+      const getRange = () => {
+        if (periodo === 'semana') {
+          const d = new Date(now);
+          const dow = d.getDay();
+          const diffToMon = dow === 0 ? -6 : 1 - dow;
+          const mon = new Date(d); mon.setDate(d.getDate() + diffToMon); mon.setHours(0,0,0,0);
+          const sun = new Date(mon); sun.setDate(mon.getDate() + 6); sun.setHours(23,59,59,999);
+          const label = 'Semana del ' + mon.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })
+            + ' al ' + sun.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+          return { from: mon, to: sun, label, key: `sem-${mon.toISOString().split('T')[0]}` };
+        } else {
+          const from = new Date(now.getFullYear(), now.getMonth(), 1);
+          const to = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+          const label = now.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
+          return { from, to, label, key: `mes-${now.getFullYear()}-${now.getMonth()}` };
+        }
+      };
+
+      const { from, to, label, key: periodKey } = getRange();
+
+      const rows = clients.map((client, ci) => {
+        const clientSessions = sessions.filter(s => {
+          if (s.clientId !== client.id) return false;
+          const d = new Date(s.date + 'T00:00:00');
+          return d >= from && d <= to;
+        });
+        const count = clientSessions.length;
+        const precio = Number(client.precioSesion) || 0;
+        const total = count * precio;
+        const cobradoKey = `${client.id}-${periodKey}`;
+        const cobrado = !!cobradas[cobradoKey];
+        return { client, ci, count, precio, total, cobrado, cobradoKey };
+      });
+
+      const rowsConSesiones = rows.filter(r => r.count > 0);
+      const rowsSinPrecio = rowsConSesiones.filter(r => r.precio === 0);
+      const totalGeneral = rows.reduce((s, r) => s + r.total, 0);
+      const totalCobrado = rows.filter(r => r.cobrado).reduce((s, r) => s + r.total, 0);
+      const pendiente = totalGeneral - totalCobrado;
+
+      const toggleCobrado = (key, total) => {
+        const next = !cobradas[key];
+        setCobradas(prev => ({ ...prev, [key]: next }));
+        if (next) showToast(`Cobrado ✓ — ${total.toFixed(2)} €`);
+        else showToast('Marcado como pendiente', 'info');
+      };
+
+      const SummaryCard = ({ label: l, amount, color, icon }) => (
+        <div className="rounded-2xl p-4 flex flex-col gap-1 relative overflow-hidden"
+          style={{ background: 'rgba(10,18,35,0.9)', border: `1px solid ${color}33` }}>
+          <div className="absolute top-0 right-0 w-20 h-20 rounded-full opacity-10 -translate-y-6 translate-x-6"
+            style={{ background: color }} />
+          <span className="text-xs font-bold uppercase tracking-wider" style={{ color }}>{icon} {l}</span>
+          <span className="text-2xl font-black mt-1" style={{ color }}>
+            {amount.toFixed(2)} €
+          </span>
+        </div>
+      );
+
+      return (
+        <div className="space-y-6 animate-slide-up">
+          {/* Header */}
+          <div className="flex items-center justify-between flex-wrap gap-3">
+            <div>
+              <h2 className="text-3xl md:text-4xl font-black"><span className="gradient-text-violet">Facturas</span></h2>
+              <p className="text-slate-500 text-sm mt-1 capitalize">{label}</p>
+            </div>
+            <div className="flex gap-1 p-1 rounded-xl" style={{ background: 'rgba(15,23,42,0.8)', border: '1px solid rgba(255,255,255,0.06)' }}>
+              {[['semana', 'Esta semana'], ['mes', 'Este mes']].map(([val, lbl]) => (
+                <button key={val} onClick={() => setPeriodo(val)}
+                  className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${periodo === val ? 'nav-active' : 'text-slate-500 hover:text-slate-200'}`}>
+                  {lbl}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Resumen */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <SummaryCard label="Total a cobrar" amount={totalGeneral} color="#a78bfa" icon="💶" />
+            <SummaryCard label="Cobrado" amount={totalCobrado} color="#34d399" icon="✅" />
+            <SummaryCard label="Pendiente" amount={pendiente} color="#f59e0b" icon="⏳" />
+          </div>
+
+          {/* Aviso clientes sin precio */}
+          {rowsSinPrecio.length > 0 && (
+            <div className="rounded-xl px-4 py-3 flex items-center gap-3 text-sm"
+              style={{ background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.2)' }}>
+              <span className="text-lg">⚠️</span>
+              <span className="text-amber-300">
+                {rowsSinPrecio.map(r => r.client.name).join(', ')}
+                {rowsSinPrecio.length === 1 ? ' no tiene' : ' no tienen'} precio por sesión configurado.
+                <button onClick={() => {}} className="underline ml-1 opacity-70">Edita el cliente para añadirlo.</button>
+              </span>
+            </div>
+          )}
+
+          {/* Tabla clientes */}
+          {rowsConSesiones.length === 0 ? (
+            <div className="rounded-3xl p-12 text-center animate-fade-in"
+              style={{ background: 'rgba(10,18,35,0.6)', border: '1px dashed rgba(255,255,255,0.08)' }}>
+              <div className="w-20 h-20 rounded-3xl mx-auto mb-5 flex items-center justify-center"
+                style={{ background: 'rgba(167,139,250,0.06)', border: '1px solid rgba(167,139,250,0.12)' }}>
+                <Receipt className="w-9 h-9" style={{ color: 'rgba(167,139,250,0.3)' }} />
+              </div>
+              <h3 className="font-black text-xl mb-2">Sin sesiones en este periodo</h3>
+              <p className="text-sm text-slate-500 max-w-xs mx-auto leading-relaxed">
+                Registra sesiones en el Calendario para que aparezcan aquí con su importe.
+              </p>
+            </div>
+          ) : (
+            <div className="rounded-2xl overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.07)' }}>
+              {/* Header tabla */}
+              <div className="grid grid-cols-12 px-5 py-3 text-[11px] font-bold uppercase tracking-wider text-slate-600"
+                style={{ background: 'rgba(5,12,28,0.95)', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                <div className="col-span-5">Cliente</div>
+                <div className="col-span-2 text-center">Sesiones</div>
+                <div className="col-span-2 text-center">€/sesión</div>
+                <div className="col-span-2 text-right">Total</div>
+                <div className="col-span-1 text-right">Cobrado</div>
+              </div>
+              {/* Filas */}
+              <div style={{ background: 'rgba(10,18,35,0.92)' }}>
+                {rowsConSesiones.map(({ client, ci, count, precio, total, cobrado, cobradoKey }, i) => (
+                  <div key={client.id}
+                    className={`grid grid-cols-12 items-center px-5 py-4 transition-all animate-bounce-in stagger-${Math.min(i+1,8)}`}
+                    style={{
+                      borderBottom: i < rowsConSesiones.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none',
+                      background: cobrado ? 'rgba(52,211,153,0.04)' : 'transparent',
+                    }}>
+                    {/* Cliente */}
+                    <div className="col-span-5 flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl flex items-center justify-center text-slate-950 font-black text-base flex-shrink-0"
+                        style={{ background: CLIENT_GRADIENTS[ci % CLIENT_GRADIENTS.length] }}>
+                        {client.name.charAt(0).toUpperCase()}
+                      </div>
+                      <div>
+                        <p className="font-bold text-sm leading-tight">{client.name}</p>
+                        {client.goal && <p className="text-[10px] text-slate-600 mt-0.5 truncate max-w-[120px]">{client.goal}</p>}
+                      </div>
+                    </div>
+                    {/* Sesiones */}
+                    <div className="col-span-2 text-center">
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-black"
+                        style={{ background: 'rgba(34,211,238,0.1)', color: '#22d3ee' }}>
+                        {count}
+                      </span>
+                    </div>
+                    {/* Precio */}
+                    <div className="col-span-2 text-center text-sm font-semibold">
+                      {precio > 0
+                        ? <span style={{ color: '#a78bfa' }}>{precio} €</span>
+                        : <span className="text-slate-700 text-xs">—</span>}
+                    </div>
+                    {/* Total */}
+                    <div className="col-span-2 text-right">
+                      <span className="text-lg font-black" style={{ color: cobrado ? '#34d399' : total > 0 ? '#fff' : '#334155' }}>
+                        {total > 0 ? `${total.toFixed(2)} €` : '—'}
+                      </span>
+                    </div>
+                    {/* Toggle cobrado */}
+                    <div className="col-span-1 flex justify-end">
+                      <button onClick={() => toggleCobrado(cobradoKey, total)}
+                        title={cobrado ? 'Marcar como pendiente' : 'Marcar como cobrado'}
+                        className="w-8 h-8 rounded-lg flex items-center justify-center transition-all text-sm"
+                        style={cobrado
+                          ? { background: 'rgba(52,211,153,0.2)', color: '#34d399', border: '1px solid rgba(52,211,153,0.35)' }
+                          : { background: 'rgba(255,255,255,0.04)', color: '#475569', border: '1px solid rgba(255,255,255,0.07)' }}>
+                        {cobrado ? <CheckCircle className="w-4 h-4" /> : <Clock className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {/* Footer total */}
+              <div className="flex items-center justify-between px-5 py-4"
+                style={{ background: 'rgba(5,12,28,0.95)', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                  {rowsConSesiones.length} {rowsConSesiones.length === 1 ? 'cliente' : 'clientes'} · {rowsConSesiones.reduce((s,r)=>s+r.count,0)} sesiones
+                </span>
+                <div className="flex items-center gap-3">
+                  <span className="text-xs text-slate-500 font-semibold">Total</span>
+                  <span className="text-2xl font-black gradient-text-violet">{totalGeneral.toFixed(2)} €</span>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    /* ── Formularios ────────────────────────────────────────────────────── */
+    function ClientForm({ onSave, onClose }) {
+      const [form, setForm] = useState({ name: '', age: '', phone: '', email: '', goal: '', notes: '', precioSesion: '' });
+      const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+      const handleSubmit = () => { if (!form.name.trim()) return alert('El nombre es obligatorio'); onSave(form); };
+      return (
+        <Modal title="Nuevo cliente" onClose={onClose}>
+          <div className="space-y-3">
+            <Input label="Nombre completo *" value={form.name} onChange={v => set('name', v)} placeholder="Ej: María García" />
+            <div className="grid grid-cols-2 gap-3">
+              <Input label="Edad" value={form.age} onChange={v => set('age', v)} type="number" placeholder="30" />
+              <Input label="Teléfono" value={form.phone} onChange={v => set('phone', v)} placeholder="600 000 000" />
+            </div>
+            <Input label="Email" value={form.email} onChange={v => set('email', v)} type="email" placeholder="email@ejemplo.com" />
+            <Input label="Objetivo" value={form.goal} onChange={v => set('goal', v)} placeholder="Ej: Perder peso, ganar fuerza..." />
+            <div className="rounded-xl p-3" style={{ background: 'rgba(167,139,250,0.07)', border: '1px solid rgba(167,139,250,0.18)' }}>
+              <label className="block text-sm font-bold mb-1" style={{ color: '#a78bfa' }}>
+                💶 Precio por sesión (€)
+              </label>
+              <input
+                type="number" min="0" step="0.5" value={form.precioSesion}
+                onChange={e => set('precioSesion', e.target.value)}
+                placeholder="Ej: 40"
+                className="w-full bg-slate-950 border border-slate-700 focus:border-violet-500 rounded-lg px-3 py-2 text-sm outline-none transition"
+              />
+              <p className="text-[11px] text-slate-500 mt-1.5">Se usará para calcular las facturas automáticamente</p>
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-slate-300 mb-1">Notas</label>
+              <textarea value={form.notes} onChange={e => set('notes', e.target.value)} rows={3}
+                className="w-full bg-slate-950 border border-slate-700 focus:border-lime-500 rounded-lg px-3 py-2 text-sm outline-none transition resize-none"
+                placeholder="Lesiones, preferencias, observaciones..." />
+            </div>
+            <button onClick={handleSubmit} className="w-full btn-glow py-3 rounded-xl flex items-center justify-center gap-2">
+              <Save className="w-5 h-5" />Guardar cliente
+            </button>
+          </div>
+        </Modal>
+      );
+    }
+
+    function WorkoutForm({ clients, preselectedClient, editing, onSave, onClose }) {
+      const [form, setForm] = useState(editing || {
+        clientId: preselectedClient?.id || clients[0]?.id || '',
+        name: '', type: 'Funcional',
+        date: new Date().toISOString().split('T')[0],
+        duration: 60, exercises: [], notes: '',
+      });
+      const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+
+      const addExercise = () => set('exercises', [...form.exercises, {
+        name: '', sets: 3, reps: 12, weight: 0, rest: 60, notes: '',
+        musculo: '', intensidad: '', tipoResistencia: 'Peso libre', inclinacion: '', nivelGoma: ''
+      }]);
+      const updateEx = (i, k, v) => {
+        const arr = [...form.exercises]; arr[i] = { ...arr[i], [k]: v }; set('exercises', arr);
+      };
+      const removeEx = (i) => set('exercises', form.exercises.filter((_, idx) => idx !== i));
+
+      const handleSubmit = () => {
+        if (!form.name.trim()) return alert('El nombre del entrenamiento es obligatorio');
+        if (!form.clientId) return alert('Selecciona un cliente');
+        if (form.exercises.length === 0) return alert('Añade al menos un ejercicio');
+        if (form.exercises.some(e => !e.name.trim())) return alert('Todos los ejercicios necesitan un nombre');
+        onSave(form);
+      };
+
+      return (
+        <Modal title={editing ? 'Editar entrenamiento' : 'Nuevo entrenamiento'} onClose={onClose}>
+          <div className="space-y-3">
+            <div>
+              <label className="block text-sm font-semibold text-slate-300 mb-1">Cliente *</label>
+              <select value={form.clientId} onChange={e => set('clientId', e.target.value)}
+                className="w-full bg-slate-950 border border-slate-700 focus:border-lime-500 rounded-lg px-3 py-2 text-sm outline-none transition">
+                <option value="">Selecciona un cliente</option>
+                {clients.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+              </select>
+            </div>
+            <Input label="Nombre del entrenamiento *" value={form.name} onChange={v => set('name', v)} placeholder="Ej: Full body TRX - Día 1" />
+            <div className="grid grid-cols-3 gap-3">
+              <div>
+                <label className="block text-sm font-semibold text-slate-300 mb-1">Tipo</label>
+                <select value={form.type} onChange={e => set('type', e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-700 focus:border-lime-500 rounded-lg px-3 py-2 text-sm outline-none transition">
+                  <option>Funcional</option><option>TRX</option><option>Mixto</option>
+                </select>
+              </div>
+              <Input label="Fecha" value={form.date} onChange={v => set('date', v)} type="date" />
+              <Input label="Duración (min)" value={form.duration} onChange={v => set('duration', v)} type="number" />
+            </div>
+            <div className="pt-3 border-t border-slate-800">
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="font-bold flex items-center gap-2"><Dumbbell className="w-4 h-4 text-lime-400" />Ejercicios</h4>
+                <button onClick={addExercise} className="text-xs bg-lime-400 hover:bg-lime-300 text-slate-950 font-bold px-3 py-1.5 rounded-lg flex items-center gap-1 transition">
+                  <Plus className="w-3 h-3" />Añadir
+                </button>
+              </div>
+              {form.exercises.length === 0 && (
+                <p className="text-sm text-slate-500 text-center py-4">Aún no hay ejercicios. Pulsa "Añadir" para empezar.</p>
+              )}
+              <div className="space-y-3">
+                {form.exercises.map((ex, i) => (
+                  <div key={i} className={`animate-bounce-in bg-slate-950 border border-slate-800 rounded-lg p-3 space-y-2 stagger-${Math.min(i + 1, 8)}`}>
+                    {/* Nombre */}
+                    <div className="flex items-center gap-2">
+                      <span className="w-6 h-6 bg-lime-400/10 text-lime-400 rounded text-xs font-bold flex items-center justify-center flex-shrink-0">{i + 1}</span>
+                      <input type="text" value={ex.name} onChange={e => updateEx(i, 'name', e.target.value)}
+                        placeholder="Nombre del ejercicio" className="flex-1 bg-slate-900 border border-slate-700 focus:border-lime-500 rounded px-2 py-1.5 text-sm outline-none" />
+                      <button onClick={() => removeEx(i)} className="text-slate-500 hover:text-red-400 p-1 flex-shrink-0"><X className="w-4 h-4" /></button>
+                    </div>
+
+                    {/* Fila 1: volumen + descanso */}
+                    <div className="grid grid-cols-4 gap-2">
+                      <MiniInput label="Series" value={ex.sets} onChange={v => updateEx(i, 'sets', parseInt(v) || 0)} />
+                      <MiniInput label="Reps" value={ex.reps} onChange={v => updateEx(i, 'reps', parseInt(v) || 0)} />
+                      <MiniInput label="Kg" value={ex.weight} onChange={v => updateEx(i, 'weight', parseFloat(v) || 0)} step="0.5" />
+                      <MiniInput label="Desc.(s)" value={ex.rest} onChange={v => updateEx(i, 'rest', parseInt(v) || 0)} />
+                    </div>
+
+                    {/* Fila 2: músculo + intensidad */}
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Grupo muscular</label>
+                        <select value={ex.musculo || ''} onChange={e => updateEx(i, 'musculo', e.target.value)}
+                          className="w-full bg-slate-900 border border-slate-700 focus:border-lime-500 rounded px-2 py-1.5 text-xs outline-none transition">
+                          <option value="">— Sin grupo —</option>
+                          {['Core','Pecho','Espalda','Hombros','Bíceps','Tríceps','Piernas','Glúteos','Full Body','Cardio'].map(m => (
+                            <option key={m} value={m}>{m}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Intensidad RPE (1–10)</label>
+                        <input type="number" min="1" max="10" value={ex.intensidad || ''} onChange={e => updateEx(i, 'intensidad', parseInt(e.target.value) || '')}
+                          placeholder="ej: 7" className="w-full bg-slate-900 border border-slate-700 focus:border-lime-500 rounded px-2 py-1.5 text-sm outline-none transition" />
+                      </div>
+                    </div>
+
+                    {/* Fila 3: tipo de resistencia + valor condicional */}
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Tipo resistencia</label>
+                        <select value={ex.tipoResistencia || 'Peso libre'} onChange={e => updateEx(i, 'tipoResistencia', e.target.value)}
+                          className="w-full bg-slate-900 border border-slate-700 focus:border-lime-500 rounded px-2 py-1.5 text-xs outline-none transition">
+                          {['Peso libre','TRX','Goma elástica','Peso corporal','Máquina'].map(t => (
+                            <option key={t} value={t}>{t}</option>
+                          ))}
+                        </select>
+                      </div>
+                      {ex.tipoResistencia === 'TRX' && (
+                        <div>
+                          <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Inclinación TRX (%)</label>
+                          <input type="number" min="5" max="90" value={ex.inclinacion || ''} onChange={e => updateEx(i, 'inclinacion', parseInt(e.target.value) || '')}
+                            placeholder="ej: 45" className="w-full bg-slate-900 border border-slate-700 focus:border-lime-500 rounded px-2 py-1.5 text-sm outline-none transition" />
+                        </div>
+                      )}
+                      {ex.tipoResistencia === 'Goma elástica' && (
+                        <div>
+                          <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Nivel de goma</label>
+                          <select value={ex.nivelGoma || ''} onChange={e => updateEx(i, 'nivelGoma', e.target.value)}
+                            className="w-full bg-slate-900 border border-slate-700 focus:border-lime-500 rounded px-2 py-1.5 text-xs outline-none transition">
+                            <option value="">Seleccionar</option>
+                            {['Ligera','Media','Fuerte','Extra fuerte'].map(n => <option key={n} value={n}>{n}</option>)}
+                          </select>
+                        </div>
+                      )}
+                    </div>
+
+                    <input type="text" value={ex.notes} onChange={e => updateEx(i, 'notes', e.target.value)}
+                      placeholder="Notas (opcional)" className="w-full bg-slate-900 border border-slate-700 focus:border-lime-500 rounded px-2 py-1 text-xs outline-none" />
+                  </div>
+                ))}
+              </div>
+            </div>
+            <button onClick={handleSubmit} className="w-full btn-glow py-3 rounded-xl flex items-center justify-center gap-2">
+              <Save className="w-5 h-5" />{editing ? 'Guardar cambios' : 'Crear entrenamiento'}
+            </button>
+          </div>
+        </Modal>
+      );
+    }
+
+    /* ── UI helpers ─────────────────────────────────────────────────────── */
+    function Modal({ title, children, onClose }) {
+      return (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
+          style={{ background: 'rgba(2,8,23,0.8)', backdropFilter: 'blur(16px)' }}>
+          <div className="modal-sheet w-full max-w-2xl max-h-[92vh] overflow-y-auto rounded-t-3xl sm:rounded-3xl"
+            style={{ background: 'rgba(10,18,35,0.97)', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 -20px 80px rgba(0,0,0,0.6)' }}>
+            {/* Header del modal con acento */}
+            <div className="sticky top-0 z-10 px-5 py-4 flex items-center justify-between rounded-t-3xl"
+              style={{ background: 'rgba(10,18,35,0.98)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+              <div className="flex items-center gap-3">
+                <div className="w-1 h-6 rounded-full" style={{ background: 'linear-gradient(to bottom, #a3e635, #22d3ee)' }} />
+                <h3 className="font-black text-lg">{title}</h3>
+              </div>
+              <button onClick={onClose}
+                className="w-8 h-8 rounded-xl flex items-center justify-center transition-all text-slate-500 hover:text-white"
+                style={{ background: 'rgba(255,255,255,0.05)' }}>
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="p-5">{children}</div>
+          </div>
+        </div>
+      );
+    }
+
+    function Input({ label, value, onChange, type = 'text', placeholder }) {
+      return (
+        <div>
+          <label className="block text-xs font-bold text-slate-400 tracking-wider uppercase mb-1.5">{label}</label>
+          <input type={type} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder}
+            className="w-full rounded-xl px-3 py-2.5 text-sm outline-none transition-all"
+            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff' }}
+            onFocus={e => e.target.style.borderColor = 'rgba(163,230,53,0.5)'}
+            onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
+        </div>
+      );
+    }
+
+    function MiniInput({ label, value, onChange, step }) {
+      return (
+        <div>
+          <label className="block text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1">{label}</label>
+          <input type="number" value={value} step={step} onChange={e => onChange(e.target.value)}
+            className="w-full rounded-lg px-2 py-1.5 text-sm outline-none transition-all"
+            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff' }}
+            onFocus={e => e.target.style.borderColor = 'rgba(163,230,53,0.5)'}
+            onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.1)'} />
+        </div>
+      );
+    }
+
+    /* ── Calendario ─────────────────────────────────────────────────────── */
+    function Calendario({ sessions, clients, workouts, onSaveSessions }) {
+      const [currentDate, setCurrentDate] = useState(new Date());
+      const [selectedDay, setSelectedDay] = useState(null);
+      const [showForm, setShowForm] = useState(false);
+      const [editingSession, setEditingSession] = useState(null);
+
+      const year = currentDate.getFullYear();
+      const month = currentDate.getMonth();
+      const MONTHS = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const firstDayOfWeek = (new Date(year, month, 1).getDay() + 6) % 7; // 0=Lun
+
+      const today = new Date();
+      const isToday = (d) => today.getFullYear() === year && today.getMonth() === month && today.getDate() === d;
+
+      // Agrupar sesiones por día del mes actual
+      const byDay = {};
+      sessions.forEach(s => {
+        const sd = new Date(s.date);
+        if (sd.getFullYear() === year && sd.getMonth() === month) {
+          const d = sd.getDate();
+          if (!byDay[d]) byDay[d] = [];
+          byDay[d].push(s);
+        }
+      });
+
+      const selectedDateStr = selectedDay
+        ? `${year}-${String(month + 1).padStart(2, '0')}-${String(selectedDay).padStart(2, '0')}`
+        : null;
+
+      const selectedSessions = selectedDay
+        ? (byDay[selectedDay] || []).slice().sort((a, b) => a.time.localeCompare(b.time))
+        : [];
+
+      const addSession = (session) => {
+        if (editingSession) {
+          onSaveSessions(sessions.map(s => s.id === editingSession.id ? { ...session, id: editingSession.id } : s));
+          setEditingSession(null);
+          showToast('Sesión actualizada ✓', 'info');
+        } else {
+          onSaveSessions([...sessions, { ...session, id: Date.now().toString() }]);
+          fireConfetti();
+          showToast('¡Sesión añadida al calendario! 🗓️');
+        }
+        setShowForm(false);
+      };
+
+      const deleteSession = (id) => {
+        if (confirm('¿Eliminar esta sesión del calendario?')) {
+          onSaveSessions(sessions.filter(s => s.id !== id));
+          showToast('Sesión eliminada', 'error');
+        }
+      };
+
+      // Celdas del grid: vacías + días del mes
+      const cells = Array(firstDayOfWeek).fill(null).concat(Array.from({ length: daysInMonth }, (_, i) => i + 1));
+
+      return (
+        <div className="space-y-6 animate-slide-up">
+          <div>
+            <h2 className="text-3xl md:text-4xl font-black"><span className="gradient-text">Calendario</span></h2>
+            <p className="text-slate-500 text-sm mt-1">Organiza tus sesiones presenciales</p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+            {/* ── Mes ── */}
+            <div className="lg:col-span-2 rounded-2xl p-5"
+              style={{ background: 'rgba(10,18,35,0.9)', border: '1px solid rgba(255,255,255,0.07)' }}>
+              {/* Cabecera navegación */}
+              <div className="flex items-center justify-between mb-5">
+                <button onClick={() => setCurrentDate(new Date(year, month - 1, 1))}
+                  className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-400 hover:text-lime-400 transition-all"
+                  style={{ background: 'rgba(255,255,255,0.04)' }}>
+                  <ArrowLeft className="w-4 h-4" />
+                </button>
+                <h3 className="font-black text-lg gradient-text">{MONTHS[month]} {year}</h3>
+                <button onClick={() => setCurrentDate(new Date(year, month + 1, 1))}
+                  className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-400 hover:text-lime-400 transition-all"
+                  style={{ background: 'rgba(255,255,255,0.04)' }}>
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Encabezados días */}
+              <div className="grid grid-cols-7 mb-2">
+                {['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'].map(d => (
+                  <div key={d} className="text-center text-[10px] font-bold text-slate-600 tracking-wider py-1 uppercase">{d}</div>
+                ))}
+              </div>
+
+              {/* Grid días */}
+              <div className="grid grid-cols-7 gap-1">
+                {cells.map((day, i) => {
+                  if (!day) return <div key={`e${i}`} />;
+                  const daySessions = byDay[day] || [];
+                  const selected = selectedDay === day;
+                  const todayMark = isToday(day);
+                  // Colores únicos por cliente del día
+                  const clientColors = ['#a3e635','#22d3ee','#34d399','#f59e0b','#a78bfa'];
+                  return (
+                    <button key={day} onClick={() => setSelectedDay(selected ? null : day)}
+                      className={`min-h-[44px] flex flex-col items-center py-1 px-0.5 rounded-xl transition-all font-semibold text-sm
+                        ${selected ? 'bg-lime-400 text-slate-950' : todayMark ? 'ring-2 ring-lime-500 bg-lime-400/10 text-lime-300' : 'hover:bg-slate-800 text-slate-300'}`}>
+                      <span>{day}</span>
+                      {daySessions.length > 0 && (
+                        <div className="flex gap-0.5 mt-0.5 flex-wrap justify-center">
+                          {daySessions.slice(0, 4).map((s, idx) => {
+                            const ci = clients.findIndex(c => c.id === s.clientId);
+                            return <div key={idx} className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: selected ? '#0f172a' : clientColors[ci % clientColors.length] }} />;
+                          })}
+                        </div>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Leyenda clientes */}
+              {clients.length > 0 && (
+                <div className="mt-4 pt-4 border-t border-slate-800 flex flex-wrap gap-3">
+                  {clients.map((c, i) => {
+                    const colors = ['#a3e635','#22d3ee','#34d399','#f59e0b','#a78bfa'];
+                    return (
+                      <div key={c.id} className="flex items-center gap-1.5 text-xs text-slate-400">
+                        <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: colors[i % colors.length] }} />
+                        {c.name}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* ── Panel lateral ── */}
+            <div className="space-y-3">
+              {selectedDay ? (
+                <>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="font-black text-lg">{selectedDay} de {MONTHS[month]}</div>
+                      <div className="text-xs text-slate-400">{selectedSessions.length} {selectedSessions.length === 1 ? 'sesión' : 'sesiones'}</div>
+                    </div>
+                    <button onClick={() => { setEditingSession(null); setShowForm(true); }}
+                      className="bg-lime-400 hover:bg-lime-300 text-slate-950 font-bold px-3 py-1.5 rounded-lg flex items-center gap-1 text-sm transition">
+                      <Plus className="w-4 h-4" />Nueva
+                    </button>
+                  </div>
+
+                  {selectedSessions.length === 0 ? (
+                    <div className="bg-slate-900 border border-slate-800 border-dashed rounded-2xl p-6 text-center">
+                      <Calendar className="w-8 h-8 text-slate-700 mx-auto mb-2" />
+                      <p className="text-sm text-slate-400">Sin sesiones este día</p>
+                      <button onClick={() => { setEditingSession(null); setShowForm(true); }}
+                        className="mt-3 text-sm text-lime-400 hover:text-lime-300 font-semibold">
+                        + Añadir sesión
+                      </button>
+                    </div>
+                  ) : (
+                    selectedSessions.map(s => {
+                      const client = clients.find(c => c.id === s.clientId);
+                      const workout = workouts.find(w => w.id === s.workoutId);
+                      const ci = clients.findIndex(c => c.id === s.clientId);
+                      const colors = ['#a3e635','#22d3ee','#34d399','#f59e0b','#a78bfa'];
+                      return (
+                        <div key={s.id} className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+                          {/* Franja de color del cliente */}
+                          <div className="h-1" style={{ backgroundColor: colors[ci % colors.length] }} />
+                          <div className="p-4">
+                            <div className="flex items-start justify-between gap-2 mb-2">
+                              <div className="flex items-center gap-2">
+                                <div className="w-9 h-9 rounded-lg flex items-center justify-center text-slate-950 font-black text-sm"
+                                  style={{ backgroundColor: colors[ci % colors.length] }}>
+                                  {client?.name.charAt(0).toUpperCase() || '?'}
+                                </div>
+                                <div>
+                                  <div className="font-bold text-sm">{client?.name || 'Cliente eliminado'}</div>
+                                  <div className="flex items-center gap-2">
+                                    <div className="text-xs font-black text-lime-400">⏰ {s.time}</div>
+                                    {s.tipo && <div className="text-[10px] font-bold text-slate-500 bg-slate-800 px-1.5 py-0.5 rounded">{s.tipo}</div>}
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="flex gap-1 flex-shrink-0">
+                                <button onClick={() => { setEditingSession(s); setShowForm(true); }}
+                                  className="p-1.5 text-slate-400 hover:text-lime-400 transition">
+                                  <Edit2 className="w-3.5 h-3.5" />
+                                </button>
+                                <button onClick={() => deleteSession(s.id)}
+                                  className="p-1.5 text-slate-400 hover:text-red-400 transition">
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            </div>
+
+                            {workout ? (
+                              <div className="bg-slate-950 rounded-lg p-3 mt-1">
+                                <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Entreno asignado</div>
+                                <div className="font-bold text-sm">{workout.name}</div>
+                                <div className="text-xs text-slate-400 mt-1 flex flex-wrap gap-2">
+                                  <span className="text-lime-400/80">{workout.type || 'Funcional'}</span>
+                                  <span>· {workout.exercises?.length || 0} ejercicios</span>
+                                  {workout.duration && <span>· {workout.duration} min</span>}
+                                </div>
+                                {workout.exercises && workout.exercises.length > 0 && (
+                                  <div className="mt-2 space-y-1">
+                                    {workout.exercises.slice(0, 3).map((ex, idx) => (
+                                      <div key={idx} className="text-xs text-slate-500 flex items-center gap-1">
+                                        <span className="text-lime-400/60">{idx + 1}.</span> {ex.name}
+                                        <span className="text-slate-600">— {ex.sets}×{ex.reps}</span>
+                                      </div>
+                                    ))}
+                                    {workout.exercises.length > 3 && (
+                                      <div className="text-xs text-slate-600">+{workout.exercises.length - 3} más...</div>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+                            ) : (
+                              <div className="text-xs text-slate-600 italic mt-1">Sin entreno asignado</div>
+                            )}
+
+                            {s.notes && <p className="text-xs text-slate-400 italic mt-2">"{s.notes}"</p>}
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                </>
+              ) : (
+                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center">
+                  <Calendar className="w-12 h-12 text-slate-700 mx-auto mb-3" />
+                  <p className="text-sm text-slate-400">Pulsa un día para ver las sesiones o añadir una nueva</p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {showForm && (
+            <SessionForm
+              clients={clients}
+              workouts={workouts}
+              date={selectedDateStr}
+              editing={editingSession}
+              onSave={addSession}
+              onClose={() => { setShowForm(false); setEditingSession(null); }}
+            />
+          )}
+        </div>
+      );
+    }
+
+    function SessionForm({ clients, workouts, date, editing, onSave, onClose }) {
+      const [form, setForm] = useState(editing || {
+        date: date || new Date().toISOString().split('T')[0],
+        time: '09:00',
+        clientId: clients[0]?.id || '',
+        tipo: 'Funcional',
+        workoutId: '',
+        notes: '',
+      });
+      const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+
+      const clientWorkouts = workouts.filter(w => w.clientId === form.clientId);
+
+      const handleClientChange = (v) => setForm(f => ({ ...f, clientId: v, workoutId: '' }));
+
+      const handleSubmit = () => {
+        if (!form.clientId) return alert('Selecciona un cliente');
+        if (!form.date) return alert('Indica la fecha');
+        if (!form.time) return alert('Indica la hora de la sesión');
+        onSave(form);
+      };
+
+      const TIPOS = ['Funcional', 'TRX', 'Mixto', 'Cardio', 'Fuerza', 'Movilidad'];
+
+      return (
+        <Modal title={editing ? 'Editar sesión' : 'Nueva sesión'} onClose={onClose}>
+          <div className="space-y-4">
+
+            {/* Cliente */}
+            <div>
+              <label className="block text-sm font-semibold text-slate-300 mb-1">Cliente *</label>
+              <select value={form.clientId} onChange={e => handleClientChange(e.target.value)}
+                className="w-full bg-slate-950 border border-slate-700 focus:border-lime-500 rounded-lg px-3 py-2 text-sm outline-none transition">
+                <option value="">Selecciona un cliente</option>
+                {clients.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+              </select>
+            </div>
+
+            {/* Fecha y hora — destacadas */}
+            <div className="bg-slate-950 rounded-xl p-4 border border-slate-700">
+              <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Fecha y hora *</div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-400 mb-1">Día</label>
+                  <input type="date" value={form.date} onChange={e => set('date', e.target.value)}
+                    className="w-full bg-slate-900 border border-slate-600 focus:border-lime-500 rounded-lg px-3 py-2.5 text-sm outline-none transition font-semibold" />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-400 mb-1">Hora</label>
+                  <input type="time" value={form.time} onChange={e => set('time', e.target.value)}
+                    className="w-full bg-slate-900 border border-slate-600 focus:border-lime-500 rounded-lg px-3 py-2.5 text-sm outline-none transition font-black text-lime-400" />
+                </div>
+              </div>
+            </div>
+
+            {/* Tipo de entrenamiento */}
+            <div>
+              <label className="block text-xs font-bold text-slate-400 tracking-wider uppercase mb-2">Tipo de entrenamiento *</label>
+              <div className="flex flex-wrap gap-2">
+                {TIPOS.map(t => (
+                  <button key={t} type="button" onClick={() => set('tipo', t)}
+                    className="px-3 py-1.5 rounded-xl text-sm font-bold transition-all"
+                    style={form.tipo === t
+                      ? { background: 'linear-gradient(135deg,#a3e635,#65a30d)', color: '#020817', boxShadow: '0 4px 14px rgba(163,230,53,0.4)' }
+                      : { background: 'rgba(255,255,255,0.05)', color: '#94a3b8', border: '1px solid rgba(255,255,255,0.08)' }}>
+                    {t}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Entrenamiento vinculado */}
+            <div>
+              <label className="block text-sm font-semibold text-slate-300 mb-1">Entreno vinculado <span className="text-slate-500 font-normal">(opcional)</span></label>
+              <select value={form.workoutId} onChange={e => set('workoutId', e.target.value)}
+                className="w-full bg-slate-950 border border-slate-700 focus:border-lime-500 rounded-lg px-3 py-2 text-sm outline-none transition">
+                <option value="">— Sin entreno asignado —</option>
+                {clientWorkouts.map(w => <option key={w.id} value={w.id}>{w.name} · {w.type || 'Funcional'} · {w.exercises?.length || 0} ej.</option>)}
+              </select>
+              {form.clientId && clientWorkouts.length === 0 && (
+                <p className="text-xs text-slate-500 mt-1">Este cliente aún no tiene entrenamientos creados.</p>
+              )}
+            </div>
+
+            {/* Notas */}
+            <div>
+              <label className="block text-sm font-semibold text-slate-300 mb-1">Notas</label>
+              <textarea value={form.notes} onChange={e => set('notes', e.target.value)} rows={2}
+                className="w-full bg-slate-950 border border-slate-700 focus:border-lime-500 rounded-lg px-3 py-2 text-sm outline-none transition resize-none"
+                placeholder="Observaciones, material necesario..." />
+            </div>
+
+            <button onClick={handleSubmit} className="w-full btn-glow py-3 rounded-xl flex items-center justify-center gap-2">
+              <Save className="w-5 h-5" />{editing ? 'Guardar cambios' : 'Crear sesión'}
+            </button>
+          </div>
+        </Modal>
+      );
+    }
+
+    /* ── Mount ──────────────────────────────────────────────────────────── */
+    ReactDOM.createRoot(document.getElementById('root')).render(
+      <React.StrictMode>
+        <EntrenamientosMestre />
+      </React.StrictMode>
+    );
+  </script>
+</body>
+</html>
